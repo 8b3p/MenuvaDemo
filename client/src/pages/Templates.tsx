@@ -57,7 +57,7 @@ const Templates = observer(() => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {isArabic ? 'قوالب القائمة' : 'Menu Templates'}
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -90,7 +90,7 @@ const Templates = observer(() => {
       )}
 
       {/* Templates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {store.templates.map((template) => {
           const isActive = store.activeTemplateId === template.id;
           return (
@@ -265,7 +265,7 @@ const Templates = observer(() => {
                     />
                   )}
                   <h3
-                    className="text-2xl font-bold"
+                    className="text-xl sm:text-2xl font-bold"
                     style={{ color: store.templateCustomization.primaryColor }}
                   >
                     {isArabic ? 'اسم المطعم' : 'Restaurant Name'}

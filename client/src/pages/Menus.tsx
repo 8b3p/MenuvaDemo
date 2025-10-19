@@ -219,8 +219,8 @@ const Menus = observer(() => {
       {/* Menus View */}
       {view === 'menus' && (
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {isArabic ? 'إدارة القوائم' : 'Manage Menus'}
             </h2>
             <Button onClick={handleAddMenu} className="bg-gradient-to-r from-blue-500 to-purple-600">
@@ -229,7 +229,7 @@ const Menus = observer(() => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {store.menus.map((menu) => (
               <Card
                 key={menu.id}
@@ -281,8 +281,8 @@ const Menus = observer(() => {
       {/* Categories View */}
       {view === 'categories' && selectedMenu && (
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {isArabic ? 'الفئات' : 'Categories'}
             </h2>
             <Button onClick={handleAddCategory} className="bg-gradient-to-r from-blue-500 to-purple-600">
@@ -291,7 +291,7 @@ const Menus = observer(() => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {selectedMenu.categories.map((category) => (
               <Card
                 key={category.id}
@@ -343,8 +343,8 @@ const Menus = observer(() => {
       {/* Items View */}
       {view === 'items' && selectedCategory && (
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {isArabic ? 'العناصر' : 'Items'}
             </h2>
             <Button onClick={handleAddItem} className="bg-gradient-to-r from-blue-500 to-purple-600">
@@ -353,7 +353,7 @@ const Menus = observer(() => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {selectedCategory.items.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
