@@ -203,6 +203,16 @@ class RootStore {
   }
 
   // Complaint actions
+  addComplaint(data: Omit<Complaint, 'id' | 'status' | 'date'>) {
+    const newComplaint: Complaint = {
+      id: Date.now().toString(),
+      ...data,
+      status: 'pending',
+      date: new Date().toISOString(),
+    };
+    this.complaints.push(newComplaint);
+  }
+
   updateComplaintStatus(id: string, status: 'pending' | 'in-progress' | 'resolved') {
     const complaint = this.complaints.find((c) => c.id === id);
     if (complaint) {
