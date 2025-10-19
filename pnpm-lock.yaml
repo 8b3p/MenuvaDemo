@@ -124,6 +124,12 @@ importers:
       lucide-react:
         specifier: ^0.453.0
         version: 0.453.0(react@18.3.1)
+      mobx:
+        specifier: ^6.15.0
+        version: 6.15.0
+      mobx-react-lite:
+        specifier: ^4.1.1
+        version: 4.1.1(mobx@6.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nanoid:
         specifier: ^5.1.5
         version: 5.1.6
@@ -142,6 +148,9 @@ importers:
       react-hook-form:
         specifier: ^7.64.0
         version: 7.64.0(react@18.3.1)
+      react-icons:
+        specifier: ^5.5.0
+        version: 5.5.0(react@18.3.1)
       react-resizable-panels:
         specifier: ^3.0.6
         version: 3.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2195,6 +2204,22 @@ packages:
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
+  mobx-react-lite@4.1.1:
+    resolution: {integrity: sha512-iUxiMpsvNraCKXU+yPotsOncNNmyeS2B5DKL+TL6Tar/xm+wwNJAubJmtRSeAoYawdZqwv8Z/+5nPRHeQxTiXg==}
+    peerDependencies:
+      mobx: ^6.9.0
+      react: ^16.8.0 || ^17 || ^18 || ^19
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
+  mobx@6.15.0:
+    resolution: {integrity: sha512-UczzB+0nnwGotYSgllfARAqWCJ5e/skuV2K/l+Zyck/H6pJIhLXuBnz+6vn2i211o7DtbE78HQtsYEKICHGI+g==}
+
   modern-screenshot@4.6.6:
     resolution: {integrity: sha512-8tF0xEpe7yx37mK95UcIghSCWYeu628K2hLJl+ZNY2ANmRzYLlRLpquPHAQcL8keF6BoeEzTEw4GrgmUpGuZ8w==}
 
@@ -2334,6 +2359,11 @@ packages:
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
+
+  react-icons@5.5.0:
+    resolution: {integrity: sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==}
+    peerDependencies:
+      react: '*'
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -4583,6 +4613,16 @@ snapshots:
 
   mitt@3.0.1: {}
 
+  mobx-react-lite@4.1.1(mobx@6.15.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      mobx: 6.15.0
+      react: 18.3.1
+      use-sync-external-store: 1.6.0(react@18.3.1)
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
+
+  mobx@6.15.0: {}
+
   modern-screenshot@4.6.6: {}
 
   motion-dom@12.23.21:
@@ -4692,6 +4732,10 @@ snapshots:
       scheduler: 0.27.0
 
   react-hook-form@7.64.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  react-icons@5.5.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
