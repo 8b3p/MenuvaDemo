@@ -13,6 +13,7 @@ import Templates from "./pages/Templates";
 import Complaints from "./pages/Complaints";
 import DashboardLayout from "./components/DashboardLayout";
 import ClassicMenu from "./pages/menu-templates/ClassicMenu";
+import ModernGrid from "./pages/menu-templates/ModernGrid";
 
 function Router() {
   const [location] = useLocation();
@@ -43,6 +44,7 @@ function Router() {
         </DashboardLayout>
       </Route>
       <Route path="/menu/classic" component={ClassicMenu} />
+      <Route path="/menu/modern" component={ModernGrid} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -337,7 +337,7 @@ const Templates = observer(() => {
               {/* QR Code */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <QRCodeSVG
-                  value={`${window.location.origin}/menu/classic`}
+                  value={`${window.location.origin}/menu/${selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : 'classic'}`}
                   size={180}
                   level="H"
                   includeMargin={true}
@@ -349,7 +349,8 @@ const Templates = observer(() => {
                 variant="outline"
                 className="w-full"
                 onClick={() => {
-                  window.open('/menu/classic', '_blank');
+                  const menuPath = selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : 'classic';
+                  window.open(`/menu/${menuPath}`, '_blank');
                 }}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
