@@ -337,7 +337,7 @@ const Templates = observer(() => {
               {/* QR Code */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <QRCodeSVG
-                  value={`${window.location.origin}/menu/${selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : 'classic'}`}
+                  value={`${window.location.origin}/menu/${selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : selectedTemplate?.id === '3' ? 'minimalist' : 'classic'}`}
                   size={180}
                   level="H"
                   includeMargin={true}
@@ -349,7 +349,7 @@ const Templates = observer(() => {
                 variant="outline"
                 className="w-full"
                 onClick={() => {
-                  const menuPath = selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : 'classic';
+                  const menuPath = selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : selectedTemplate?.id === '3' ? 'minimalist' : 'classic';
                   window.open(`/menu/${menuPath}`, '_blank');
                 }}
               >
