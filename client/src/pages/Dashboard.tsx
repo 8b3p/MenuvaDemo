@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/contexts/StoreContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { TrendingUp, Users, ShoppingBag, MessageSquare, DollarSign, Star } from 'lucide-react';
 
 const Dashboard = observer(() => {
@@ -73,162 +74,209 @@ const Dashboard = observer(() => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
-                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {stat.value}
-                    </h3>
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-2 flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4" />
-                      {stat.change}
-                    </p>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">{stat.title}</p>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                        {stat.value}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-2 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                        {stat.change}
+                      </p>
+                    </div>
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
+                      <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
                   </div>
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           );
         })}
       </div>
 
       {/* Charts and Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              {isArabic ? 'النشاط الأخير' : 'Recent Activity'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === 'order'
-                      ? 'bg-blue-500'
-                      : activity.type === 'complaint'
-                      ? 'bg-red-500'
-                      : 'bg-green-500'
-                  }`} />
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-900 dark:text-white font-medium">
-                      {activity.message}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+        >
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                {isArabic ? 'النشاط الأخير' : 'Recent Activity'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 sm:space-y-4">
+                {recentActivity.map((activity) => (
+                  <motion.div
+                    key={activity.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + activity.id * 0.05 }}
+                    className="flex items-start gap-3 p-2 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                      activity.type === 'order'
+                        ? 'bg-blue-500'
+                        : activity.type === 'complaint'
+                        ? 'bg-red-500'
+                        : 'bg-green-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-900 dark:text-white font-medium truncate">
+                        {activity.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Top Selling Items */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              {isArabic ? 'الأصناف الأكثر مبيعاً' : 'Top Selling Items'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {topItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                      {index + 1}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5, duration: 0.3 }}
+        >
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                {isArabic ? 'الأصناف الأكثر مبيعاً' : 'Top Selling Items'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 sm:space-y-4">
+                {topItems.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + index * 0.05 }}
+                    className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.orders} {isArabic ? 'طلب' : 'orders'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.orders} {isArabic ? 'طلب' : 'orders'}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-bold text-green-600 dark:text-green-400">
-                    {item.revenue}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                    <p className="text-xs sm:text-sm font-bold text-green-600 dark:text-green-400 flex-shrink-0">
+                      {item.revenue}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {isArabic ? 'إجمالي القوائم' : 'Total Menus'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white">
-              {store.menus.length}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {isArabic ? 'قوائم نشطة' : 'Active menus'}
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-sm sm:text-base">
+                {isArabic ? 'إجمالي القوائم' : 'Total Menus'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                {store.menus.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                {isArabic ? 'قوائم نشطة' : 'Active menus'}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {isArabic ? 'إجمالي الأصناف' : 'Total Items'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white">
-              {store.menus.reduce(
-                (acc, menu) =>
-                  acc + menu.categories.reduce((catAcc, cat) => catAcc + cat.items.length, 0),
-                0
-              )}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {isArabic ? 'عبر جميع القوائم' : 'Across all menus'}
-            </p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-sm sm:text-base">
+                {isArabic ? 'إجمالي الأصناف' : 'Total Items'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                {store.menus.reduce(
+                  (acc, menu) =>
+                    acc + menu.categories.reduce((catAcc, cat) => catAcc + cat.items.length, 0),
+                  0
+                )}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                {isArabic ? 'عبر جميع القوائم' : 'Across all menus'}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {isArabic ? 'الشكاوى المعلقة' : 'Pending Complaints'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-gray-900 dark:text-white">
-              {store.complaints.filter((c) => c.status === 'pending').length}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {isArabic ? 'تتطلب الاهتمام' : 'Require attention'}
-            </p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader>
+              <CardTitle className="text-sm sm:text-base">
+                {isArabic ? 'الشكاوى المعلقة' : 'Pending Complaints'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+                {store.complaints.filter((c) => c.status === 'pending').length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                {isArabic ? 'تتطلب الاهتمام' : 'Require attention'}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

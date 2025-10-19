@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/contexts/StoreContext';
 import { useState } from 'react';

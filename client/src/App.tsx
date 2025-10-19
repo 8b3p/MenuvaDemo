@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { StoreProvider } from "./contexts/StoreContext";
@@ -13,8 +14,11 @@ import Complaints from "./pages/Complaints";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
+  const [location] = useLocation();
+  
   return (
-    <Switch>
+    <AnimatePresence mode="wait">
+    <Switch location={location}>
       <Route path="/" component={Login} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard">
@@ -40,6 +44,7 @@ function Router() {
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
+    </AnimatePresence>
   );
 }
 
