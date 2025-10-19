@@ -12,6 +12,7 @@ import Menus from "./pages/Menus";
 import Templates from "./pages/Templates";
 import Complaints from "./pages/Complaints";
 import DashboardLayout from "./components/DashboardLayout";
+import ClassicMenu from "./pages/menu-templates/ClassicMenu";
 
 function Router() {
   const [location] = useLocation();
@@ -41,6 +42,7 @@ function Router() {
           <Complaints />
         </DashboardLayout>
       </Route>
+      <Route path="/menu/classic" component={ClassicMenu} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

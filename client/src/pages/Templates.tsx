@@ -14,8 +14,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Check, Upload, Palette, Eye } from 'lucide-react';
+import { Check, Upload, Palette, Eye, QrCode, ExternalLink } from 'lucide-react';
 import type { Template } from '@/stores/RootStore';
+import { QRCodeSVG } from 'qrcode.react';
 
 const Templates = observer(() => {
   const store = useStore();
@@ -311,13 +312,52 @@ const Templates = observer(() => {
             <DialogTitle>{selectedTemplate?.name}</DialogTitle>
             <DialogDescription>{selectedTemplate?.description}</DialogDescription>
           </DialogHeader>
-          <div className="aspect-video rounded-lg overflow-hidden">
-            <img
-              src={selectedTemplate?.thumbnail}
-              alt={selectedTemplate?.name}
-              className="w-full h-full object-cover"
-            />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Template Preview */}
+            <div className="aspect-video rounded-lg overflow-hidden border">
+              <img
+                src={selectedTemplate?.thumbnail}
+                alt={selectedTemplate?.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            {/* QR Code and Link */}
+            <div className="flex flex-col items-center justify-center gap-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <div className="text-center mb-2">
+                <h4 className="font-semibold text-lg mb-1">
+                  {isArabic ? 'رمز الاستجابة السريعة للقائمة' : 'Menu QR Code'}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {isArabic ? 'امسح للعرض على الهاتف المحمول' : 'Scan to view on mobile'}
+                </p>
+              </div>
+              
+              {/* QR Code */}
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <QRCodeSVG
+                  value={`${window.location.origin}/menu/${selectedTemplate?.id}`}
+                  size={180}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+              
+              {/* Direct Link */}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  window.open(`/menu/${selectedTemplate?.id}`, '_blank');
+                }}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                {isArabic ? 'فتح القائمة' : 'Open Menu'}
+              </Button>
+            </div>
           </div>
+          
           <DialogFooter>
             <Button variant="outline" onClick={() => setPreviewDialog(false)}>
               {isArabic ? 'إغلاق' : 'Close'}
