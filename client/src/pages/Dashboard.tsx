@@ -244,7 +244,7 @@ const Dashboard = observer(() => {
               <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
                 {store.menus.reduce(
                   (acc, menu) =>
-                    acc + menu.categories.reduce((catAcc, cat) => catAcc + cat.items.length, 0),
+                    acc + menu.categories.reduce((catAcc: any, cat: any) => catAcc + cat.items.length, 0),
                   0
                 )}
               </p>

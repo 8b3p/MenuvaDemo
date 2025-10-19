@@ -82,7 +82,7 @@ const Templates = observer(() => {
                   {isArabic ? 'القالب النشط' : 'Active Template'}
                 </p>
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  {store.templates.find((t) => t.id === store.activeTemplateId)?.name}
+                  {store.templates.find((t: any) => t.id === store.activeTemplateId)?.name}
                 </p>
               </div>
             </div>
@@ -92,7 +92,7 @@ const Templates = observer(() => {
 
       {/* Templates Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {store.templates.map((template) => {
+        {store.templates.map((template: any) => {
           const isActive = store.activeTemplateId === template.id;
           return (
             <Card
