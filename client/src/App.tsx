@@ -45,6 +45,7 @@ function Router() {
         </DashboardLayout>
       </Route>
       <Route path="/menu/classic" component={ClassicMenu} />
+      <Route path="/menu/classic/:itemId" component={ClassicMenu} />
       <Route path="/menu/modern" component={ModernGrid} />
       <Route path="/menu/minimalist" component={Minimalist} />
       <Route path="/404" component={NotFound} />

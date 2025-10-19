@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/contexts/StoreContext';
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,15 +14,15 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { MessageCircle, Send, Loader2, Clock, Flame, Leaf } from 'lucide-react';
+import { MessageCircle, Send, Loader2, X, Clock, Flame, Leaf, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { MenuItem } from '@/stores/RootStore';
 
-const ClassicMenu = observer(() => {
+const ModernGrid = observer(() => {
   const store = useStore();
   const [isLoading, setIsLoading] = useState(true);
-  const [complaintDialog, setComplaintDialog] = useState(false);
-  const [itemDetailDialog, setItemDetailDialog] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [complaintDialog, setComplaintDialog] = useState(false);
   const [complaintForm, setComplaintForm] = useState({
     name: '',
     email: '',
@@ -30,11 +30,9 @@ const ClassicMenu = observer(() => {
     message: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
-  // Get the active menu
   const activeMenu = store.menus[0];
-  
-  // Get template customization
   const customization = {
     primaryColor: store.templateCustomization.primaryColor || '#FF6B6B',
     secondaryColor: store.templateCustomization.secondaryColor || '#4ECDC4',
@@ -44,17 +42,17 @@ const ClassicMenu = observer(() => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
-
+      if (activeMenu?.categories?.[0]) {
+        setSelectedCategory(activeMenu.categories[0].id);
+      }
+    }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [activeMenu]);
 
   const handleComplaintSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
     store.addComplaint({
       customerName: complaintForm.name,
       email: complaintForm.email,
@@ -62,74 +60,66 @@ const ClassicMenu = observer(() => {
       message: complaintForm.message,
       category: 'General',
     });
-
     setSubmitting(false);
     setComplaintDialog(false);
     setComplaintForm({ name: '', email: '', phone: '', message: '' });
-    
-    alert('Thank you! Your feedback has been submitted.');
+    alert('Feedback submitted! 🎉');
   };
 
-  const scrollToCategory = (categoryId: string) => {
-    const element = document.getElementById(`category-${categoryId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = 200;
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
     }
-  };
-
-  const getDietaryIcon = (tag: string) => {
-    const icons: Record<string, string> = {
-      vegetarian: '🥬',
-      vegan: '🌱',
-      'gluten-free': '🌾',
-      'dairy-free': '🥛',
-      halal: '☪️',
-      kosher: '✡️',
-    };
-    return icons[tag] || '';
   };
 
   if (!activeMenu) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">No Menu Available</h1>
-          <p className="text-gray-600">Please configure your menu in the dashboard.</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500">
+        <p className="text-white text-xl">No menu available</p>
       </div>
     );
   }
 
+  const currentCategory = activeMenu.categories.find((c: any) => c.id === selectedCategory);
+
   // Loading Screen
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
           {customization.logo && (
             <motion.img
               src={customization.logo}
-              alt="Restaurant Logo"
-              className="h-32 w-32 mx-auto mb-8 rounded-full object-cover shadow-2xl"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              alt="Logo"
+              className="h-32 w-32 mx-auto mb-6 rounded-3xl object-cover shadow-2xl"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             />
           )}
           <motion.div
-            className="text-5xl font-serif font-bold mb-6 text-gray-800"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-5xl font-black mb-4 text-white drop-shadow-lg"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 1, repeat: Infinity }}
           >
             {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
           </motion.div>
-          <div className="flex items-center gap-2 justify-center">
-            <Loader2 className="w-5 h-5 animate-spin" style={{ color: customization.primaryColor }} />
-            <span className="text-gray-600 font-medium">
-              {store.language === 'ar' ? 'جاري التحميل...' : 'Loading menu...'}
-            </span>
+          <div className="flex gap-2 justify-center">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-3 h-3 bg-white rounded-full"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+              />
+            ))}
           </div>
         </motion.div>
       </div>
@@ -137,250 +127,222 @@ const ClassicMenu = observer(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50"
-      >
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="text-center mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500">
+      {/* Compact Header */}
+      <div className="sticky top-0 z-40 bg-white/10 backdrop-blur-xl border-b border-white/20">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
             {customization.logo && (
-              <motion.img
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
+              <img
                 src={customization.logo}
-                alt="Restaurant Logo"
-                className="h-20 w-20 mx-auto mb-4 rounded-full object-cover shadow-lg"
+                alt="Logo"
+                className="h-12 w-12 rounded-2xl object-cover shadow-lg"
               />
             )}
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-black text-white drop-shadow-md">
               {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
             </h1>
+            <div className="w-12" />
           </div>
 
-          {/* Category Navigation */}
-          <div className="flex gap-3 justify-center flex-wrap">
-            {activeMenu.categories.map((category: any) => (
-              <motion.button
-                key={category.id}
-                onClick={() => scrollToCategory(category.id)}
-                whileTap={{ scale: 0.95 }}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm hover:shadow-md"
-                style={{
-                  backgroundColor: customization.primaryColor,
-                  color: 'white',
-                }}
-              >
-                {store.language === 'ar' ? category.nameAr : category.name}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Menu Content - Single Scroll */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {activeMenu.categories.map((category: any, categoryIndex: number) => (
-          <motion.div
-            key={category.id}
-            id={`category-${category.id}`}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: categoryIndex * 0.1 }}
-            className="mb-16 scroll-mt-32"
-          >
-            {/* Category Header */}
-            <div className="text-center mb-10">
-              <h2 
-                className="text-4xl md:text-5xl font-serif font-bold mb-3"
-                style={{ color: customization.primaryColor }}
-              >
-                {store.language === 'ar' ? category.nameAr : category.name}
-              </h2>
-              <div 
-                className="h-1 w-24 mx-auto rounded-full"
-                style={{ backgroundColor: customization.secondaryColor }}
-              />
+          {/* Horizontal Scrolling Categories */}
+          <div className="relative">
+            <button
+              onClick={() => scrollCategories('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 backdrop-blur-md rounded-full p-2 hover:bg-white/30 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-white" />
+            </button>
+            
+            <div
+              ref={categoryScrollRef}
+              className="flex gap-3 overflow-x-auto scrollbar-hide px-10"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {activeMenu.categories.map((category: any) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all flex-shrink-0 ${
+                    selectedCategory === category.id
+                      ? 'bg-white text-purple-600 shadow-lg scale-110'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  {store.language === 'ar' ? category.nameAr : category.name}
+                </button>
+              ))}
             </div>
 
-            {/* Items - Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {category.items.map((item: any, itemIndex: number) => (
+            <button
+              onClick={() => scrollCategories('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 backdrop-blur-md rounded-full p-2 hover:bg-white/30 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid Items */}
+      <div className="p-4 pb-24">
+        <AnimatePresence mode="wait">
+          {currentCategory && (
+            <motion.div
+              key={selectedCategory}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+              {currentCategory.items.map((item: any, index: number) => (
                 <motion.div
                   key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: itemIndex * 0.05 }}
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setItemDetailDialog(true);
-                  }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all cursor-pointer group flex flex-col h-full"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => setSelectedItem(item)}
+                  className="group cursor-pointer"
                 >
-                  {/* Image Placeholder */}
-                  <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center text-6xl">
-                      🍽️
+                  <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+                    {/* Image Area with Gradient Overlay */}
+                    <div className="relative h-48 bg-gradient-to-br from-purple-400 to-pink-400 overflow-hidden">
+                      <div className="absolute inset-0 flex items-center justify-center text-7xl">
+                        🍽️
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Badges */}
+                      <div className="absolute top-3 right-3 flex flex-col gap-2">
+                        {item.spiceLevel && (
+                          <div className="bg-red-500 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs font-bold">
+                            {Array.from({ length: item.spiceLevel }).map((_: any, i: number) => (
+                              <Flame key={i} className="w-3 h-3" fill="currentColor" />
+                            ))}
+                          </div>
+                        )}
+                        {item.dietaryTags?.slice(0, 1).map((tag: string) => (
+                          <div key={tag} className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                            {tag === 'vegetarian' ? '🥬' : tag === 'vegan' ? '🌱' : '✓'}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Price Badge */}
+                      <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <div className="text-2xl font-black" style={{ color: customization.primaryColor }}>
+                          ${item.price.toFixed(2)}
+                        </div>
+                      </div>
                     </div>
-                    {item.dietaryTags && item.dietaryTags.length > 0 && (
-                      <div className="absolute top-3 right-3 flex gap-1.5">
-                        {item.dietaryTags.map((tag: string) => (
-                          <span key={tag} className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm" title={tag}>
-                            {getDietaryIcon(tag)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {item.spiceLevel && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                        {Array.from({ length: item.spiceLevel }).map((_, i) => (
-                          <Flame key={i} className="w-3 h-3" fill="currentColor" />
-                        ))}
-                      </div>
-                    )}
-                  </div>
 
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-                      {store.language === 'ar' ? item.nameAr : item.name}
-                    </h3>
-                    
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-1">
-                      {store.language === 'ar' ? item.descriptionAr : item.description}
-                    </p>
+                    {/* Content */}
+                    <div className="p-4">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+                        {store.language === 'ar' ? item.nameAr : item.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                        {store.language === 'ar' ? item.descriptionAr : item.description}
+                      </p>
 
-                    {/* Quick Info */}
-                    <div className="flex items-center justify-between text-sm mb-3">
-                      <div className="flex items-center gap-2">
+                      {/* Quick Info */}
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
                         {item.prepTime && (
-                          <div className="flex items-center gap-1 text-gray-500">
+                          <div className="flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5" />
-                            <span>{item.prepTime}m</span>
+                            {item.prepTime}m
                           </div>
                         )}
                         {item.calories && (
-                          <div className="flex items-center gap-1 text-gray-500">
+                          <div className="flex items-center gap-1">
                             <Flame className="w-3.5 h-3.5" />
-                            <span>{item.calories}</span>
+                            {item.calories}
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t">
-                      <div 
-                        className="text-2xl font-bold"
-                        style={{ color: customization.secondaryColor }}
-                      >
-                        ${item.price.toFixed(2)}
-                      </div>
-                      {item.sizes && item.sizes.length > 0 && (
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                          {store.language === 'ar' ? 'أحجام متعددة' : 'Multiple sizes'}
-                        </span>
-                      )}
                     </div>
                   </div>
                 </motion.div>
               ))}
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Footer */}
-      <div className="bg-white/90 backdrop-blur-md border-t py-8 text-center">
-        <p className="text-lg text-gray-600 font-serif italic">
-          {store.language === 'ar' ? 'شكراً لزيارتكم' : 'Thank you for dining with us'}
-        </p>
-      </div>
+      {/* Bottom Sheet for Item Details */}
+      <AnimatePresence>
+        {selectedItem && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
 
-      {/* Floating Complaint Button */}
-      <motion.button
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setComplaintDialog(true)}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white z-50"
-        style={{ backgroundColor: customization.primaryColor }}
-      >
-        <MessageCircle className="w-7 h-7" />
-      </motion.button>
+            {/* Bottom Sheet */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto"
+            >
+              {/* Handle */}
+              <div className="sticky top-0 bg-white pt-4 pb-2 px-6 border-b flex items-center justify-between rounded-t-3xl">
+                <div className="w-16 h-1.5 bg-gray-300 rounded-full mx-auto" />
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
-      {/* Item Detail Dialog */}
-      <Dialog open={itemDetailDialog} onOpenChange={setItemDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          {selectedItem && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-3xl font-serif font-bold flex items-center gap-3">
-                  {store.language === 'ar' ? selectedItem.nameAr : selectedItem.name}
-                  {selectedItem.spiceLevel && (
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: selectedItem.spiceLevel }).map((_, i) => (
-                        <Flame key={i} className="w-5 h-5 text-red-500" fill="currentColor" />
-                      ))}
-                    </div>
-                  )}
-                </DialogTitle>
-                <DialogDescription className="text-base mt-2">
-                  {store.language === 'ar' ? selectedItem.descriptionAr : selectedItem.description}
-                </DialogDescription>
-              </DialogHeader>
+              <div className="p-6">
+                {/* Title */}
+                <div className="mb-6">
+                  <h2 className="text-3xl font-black text-gray-900 mb-2">
+                    {store.language === 'ar' ? selectedItem.nameAr : selectedItem.name}
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed">
+                    {store.language === 'ar' ? selectedItem.descriptionAr : selectedItem.description}
+                  </p>
+                </div>
 
-              <div className="space-y-6 py-4">
-                {/* Price & Quick Info */}
-                <div className="flex items-center gap-6 flex-wrap">
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">
-                      {store.language === 'ar' ? 'السعر' : 'Price'}
-                    </div>
-                    <div className="text-3xl font-bold" style={{ color: customization.secondaryColor }}>
-                      ${selectedItem.price.toFixed(2)}
-                    </div>
+                {/* Price & Info Cards */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="bg-gradient-to-br from-purple-500 to-pink-500 text-white p-4 rounded-2xl text-center">
+                    <div className="text-sm mb-1">{store.language === 'ar' ? 'السعر' : 'Price'}</div>
+                    <div className="text-2xl font-black">${selectedItem.price.toFixed(2)}</div>
                   </div>
                   {selectedItem.prepTime && (
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">
-                        {store.language === 'ar' ? 'وقت التحضير' : 'Prep Time'}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-lg font-semibold">
-                        <Clock className="w-5 h-5" />
-                        {selectedItem.prepTime} {store.language === 'ar' ? 'دقيقة' : 'min'}
-                      </div>
+                    <div className="bg-gray-100 p-4 rounded-2xl text-center">
+                      <div className="text-sm text-gray-600 mb-1">{store.language === 'ar' ? 'الوقت' : 'Time'}</div>
+                      <div className="text-2xl font-black text-gray-900">{selectedItem.prepTime}m</div>
                     </div>
                   )}
                   {selectedItem.calories && (
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">
-                        {store.language === 'ar' ? 'السعرات' : 'Calories'}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-lg font-semibold">
-                        <Flame className="w-5 h-5" />
-                        {selectedItem.calories} {store.language === 'ar' ? 'سعرة' : 'cal'}
-                      </div>
+                    <div className="bg-gray-100 p-4 rounded-2xl text-center">
+                      <div className="text-sm text-gray-600 mb-1">{store.language === 'ar' ? 'سعرات' : 'Cal'}</div>
+                      <div className="text-2xl font-black text-gray-900">{selectedItem.calories}</div>
                     </div>
                   )}
                 </div>
 
                 {/* Ingredients */}
                 {selectedItem.ingredients && selectedItem.ingredients.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'المكونات' : 'Ingredients'}
-                    </h4>
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold mb-3">{store.language === 'ar' ? 'المكونات' : 'Ingredients'}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {(store.language === 'ar' ? selectedItem.ingredientsAr : selectedItem.ingredients)?.map((ingredient, i) => (
+                      {(store.language === 'ar' ? selectedItem.ingredientsAr : selectedItem.ingredients)?.map((ing: string, i: number) => (
                         <span
                           key={i}
-                          className="px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-700"
+                          className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
                         >
-                          {ingredient}
+                          {ing}
                         </span>
                       ))}
                     </div>
@@ -389,22 +351,16 @@ const ClassicMenu = observer(() => {
 
                 {/* Sizes */}
                 {selectedItem.sizes && selectedItem.sizes.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'الأحجام المتاحة' : 'Available Sizes'}
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {selectedItem.sizes.map((size, i) => (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold mb-3">{store.language === 'ar' ? 'الأحجام' : 'Sizes'}</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      {selectedItem.sizes.map((size: any, i: number) => (
                         <div
                           key={i}
-                          className="p-4 border-2 rounded-lg text-center hover:border-gray-400 transition-colors"
+                          className="p-3 border-2 border-purple-200 rounded-xl text-center hover:border-purple-500 transition-colors"
                         >
-                          <div className="font-semibold text-gray-900">
-                            {store.language === 'ar' ? size.nameAr : size.name}
-                          </div>
-                          <div className="text-lg font-bold mt-1" style={{ color: customization.secondaryColor }}>
-                            ${size.price.toFixed(2)}
-                          </div>
+                          <div className="text-sm text-gray-600">{store.language === 'ar' ? size.nameAr : size.name}</div>
+                          <div className="text-lg font-bold text-purple-600">${size.price.toFixed(2)}</div>
                         </div>
                       ))}
                     </div>
@@ -413,20 +369,16 @@ const ClassicMenu = observer(() => {
 
                 {/* Options */}
                 {selectedItem.options && selectedItem.options.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'الإضافات' : 'Add-ons'}
-                    </h4>
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold mb-3">{store.language === 'ar' ? 'الإضافات' : 'Add-ons'}</h3>
                     <div className="space-y-2">
-                      {selectedItem.options.map((option) => (
+                      {selectedItem.options.map((option: any) => (
                         <div
                           key={option.id}
-                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                          className="flex justify-between items-center p-3 bg-gray-50 rounded-xl"
                         >
-                          <span className="font-medium">
-                            {store.language === 'ar' ? option.nameAr : option.name}
-                          </span>
-                          <span className="font-bold text-gray-700">
+                          <span className="font-medium">{store.language === 'ar' ? option.nameAr : option.name}</span>
+                          <span className="font-bold text-purple-600">
                             {option.price > 0 ? `+$${option.price.toFixed(2)}` : store.language === 'ar' ? 'مجاناً' : 'Free'}
                           </span>
                         </div>
@@ -437,15 +389,13 @@ const ClassicMenu = observer(() => {
 
                 {/* Allergens */}
                 {selectedItem.allergens && selectedItem.allergens.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3 text-red-600">
-                      {store.language === 'ar' ? 'مسببات الحساسية' : 'Allergens'}
-                    </h4>
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-red-600 mb-3">{store.language === 'ar' ? 'مسببات الحساسية' : 'Allergens'}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {(store.language === 'ar' ? selectedItem.allergensAr : selectedItem.allergens)?.map((allergen, i) => (
+                      {(store.language === 'ar' ? selectedItem.allergensAr : selectedItem.allergens)?.map((allergen: string, i: number) => (
                         <span
                           key={i}
-                          className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-sm font-medium text-red-700"
+                          className="px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-sm font-medium"
                         >
                           {allergen}
                         </span>
@@ -456,18 +406,17 @@ const ClassicMenu = observer(() => {
 
                 {/* Dietary Tags */}
                 {selectedItem.dietaryTags && selectedItem.dietaryTags.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                      <Leaf className="w-5 h-5 text-green-600" />
-                      {store.language === 'ar' ? 'معلومات غذائية' : 'Dietary Information'}
-                    </h4>
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-green-600 mb-3 flex items-center gap-2">
+                      <Leaf className="w-5 h-5" />
+                      {store.language === 'ar' ? 'معلومات غذائية' : 'Dietary Info'}
+                    </h3>
                     <div className="flex flex-wrap gap-2">
-                      {selectedItem.dietaryTags.map((tag) => (
+                      {selectedItem.dietaryTags.map((tag: string) => (
                         <span
                           key={tag}
-                          className="px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm font-medium text-green-700 capitalize flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium capitalize"
                         >
-                          <span>{getDietaryIcon(tag)}</span>
                           {tag.replace('-', ' ')}
                         </span>
                       ))}
@@ -475,111 +424,82 @@ const ClassicMenu = observer(() => {
                   </div>
                 )}
               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setItemDetailDialog(false)}>
-                  {store.language === 'ar' ? 'إغلاق' : 'Close'}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Floating Complaint Button */}
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 1, type: 'spring' }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setComplaintDialog(true)}
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white z-40 bg-gradient-to-br from-purple-600 to-pink-600"
+      >
+        <MessageCircle className="w-7 h-7" />
+      </motion.button>
 
       {/* Complaint Dialog */}
       <Dialog open={complaintDialog} onOpenChange={setComplaintDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-2xl font-black">
               {store.language === 'ar' ? 'إرسال ملاحظة' : 'Send Feedback'}
             </DialogTitle>
             <DialogDescription>
-              {store.language === 'ar'
-                ? 'نحن نقدر ملاحظاتكم ونسعى لتحسين خدماتنا'
-                : 'We value your feedback and strive to improve our service'}
+              {store.language === 'ar' ? 'نحن نقدر ملاحظاتكم' : 'We value your feedback'}
             </DialogDescription>
           </DialogHeader>
-
           <form onSubmit={handleComplaintSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">
-                {store.language === 'ar' ? 'الاسم' : 'Name'}
-              </Label>
+              <Label htmlFor="name">{store.language === 'ar' ? 'الاسم' : 'Name'}</Label>
               <Input
                 id="name"
                 value={complaintForm.name}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, name: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, name: e.target.value })}
                 required
-                placeholder={store.language === 'ar' ? 'أدخل اسمك' : 'Enter your name'}
               />
             </div>
-
             <div>
-              <Label htmlFor="email">
-                {store.language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-              </Label>
+              <Label htmlFor="email">{store.language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
               <Input
                 id="email"
                 type="email"
                 value={complaintForm.email}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, email: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, email: e.target.value })}
                 required
-                placeholder={store.language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
               />
             </div>
-
             <div>
-              <Label htmlFor="phone">
-                {store.language === 'ar' ? 'رقم الهاتف' : 'Phone'}
-              </Label>
+              <Label htmlFor="phone">{store.language === 'ar' ? 'رقم الهاتف' : 'Phone'}</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={complaintForm.phone}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, phone: e.target.value })
-                }
-                placeholder={store.language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone'}
+                onChange={(e) => setComplaintForm({ ...complaintForm, phone: e.target.value })}
               />
             </div>
-
             <div>
-              <Label htmlFor="message">
-                {store.language === 'ar' ? 'الرسالة' : 'Message'}
-              </Label>
+              <Label htmlFor="message">{store.language === 'ar' ? 'الرسالة' : 'Message'}</Label>
               <Textarea
                 id="message"
                 value={complaintForm.message}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, message: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, message: e.target.value })}
                 required
                 rows={4}
-                placeholder={
-                  store.language === 'ar'
-                    ? 'أخبرنا عن تجربتك...'
-                    : 'Tell us about your experience...'
-                }
               />
             </div>
-
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setComplaintDialog(false)}
-                disabled={submitting}
-              >
+              <Button type="button" variant="outline" onClick={() => setComplaintDialog(false)} disabled={submitting}>
                 {store.language === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
-                style={{ backgroundColor: customization.primaryColor }}
+                className="bg-gradient-to-r from-purple-600 to-pink-600"
               >
                 {submitting ? (
                   <>
@@ -601,5 +521,5 @@ const ClassicMenu = observer(() => {
   );
 });
 
-export default ClassicMenu;
+export default ModernGrid;
 

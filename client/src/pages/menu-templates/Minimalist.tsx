@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/contexts/StoreContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,15 +14,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { MessageCircle, Send, Loader2, Clock, Flame, Leaf } from 'lucide-react';
+import { MessageCircle, Send, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import type { MenuItem } from '@/stores/RootStore';
 
-const ClassicMenu = observer(() => {
+const Minimalist = observer(() => {
   const store = useStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [complaintDialog, setComplaintDialog] = useState(false);
-  const [itemDetailDialog, setItemDetailDialog] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [complaintForm, setComplaintForm] = useState({
     name: '',
     email: '',
@@ -31,30 +30,21 @@ const ClassicMenu = observer(() => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Get the active menu
   const activeMenu = store.menus[0];
-  
-  // Get template customization
   const customization = {
-    primaryColor: store.templateCustomization.primaryColor || '#FF6B6B',
-    secondaryColor: store.templateCustomization.secondaryColor || '#4ECDC4',
+    accentColor: store.templateCustomization.primaryColor || '#000000',
     logo: store.templateCustomization.logo,
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
+    const timer = setTimeout(() => setIsLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
   const handleComplaintSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
     store.addComplaint({
       customerName: complaintForm.name,
       email: complaintForm.email,
@@ -62,40 +52,16 @@ const ClassicMenu = observer(() => {
       message: complaintForm.message,
       category: 'General',
     });
-
     setSubmitting(false);
     setComplaintDialog(false);
     setComplaintForm({ name: '', email: '', phone: '', message: '' });
-    
-    alert('Thank you! Your feedback has been submitted.');
-  };
-
-  const scrollToCategory = (categoryId: string) => {
-    const element = document.getElementById(`category-${categoryId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const getDietaryIcon = (tag: string) => {
-    const icons: Record<string, string> = {
-      vegetarian: '🥬',
-      vegan: '🌱',
-      'gluten-free': '🌾',
-      'dairy-free': '🥛',
-      halal: '☪️',
-      kosher: '✡️',
-    };
-    return icons[tag] || '';
+    alert('Thank you for your feedback.');
   };
 
   if (!activeMenu) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">No Menu Available</h1>
-          <p className="text-gray-600">Please configure your menu in the dashboard.</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-gray-400 text-sm">No menu available</p>
       </div>
     );
   }
@@ -103,478 +69,327 @@ const ClassicMenu = observer(() => {
   // Loading Screen
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="text-center"
         >
           {customization.logo && (
             <motion.img
               src={customization.logo}
-              alt="Restaurant Logo"
-              className="h-32 w-32 mx-auto mb-8 rounded-full object-cover shadow-2xl"
-              animate={{ scale: [1, 1.05, 1] }}
+              alt="Logo"
+              className="h-20 w-20 mx-auto mb-8 rounded-full object-cover opacity-60"
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
           )}
           <motion.div
-            className="text-5xl font-serif font-bold mb-6 text-gray-800"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-sm tracking-[0.3em] uppercase text-gray-400"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
+            {store.language === 'ar' ? 'جاري التحميل' : 'Loading'}
           </motion.div>
-          <div className="flex items-center gap-2 justify-center">
-            <Loader2 className="w-5 h-5 animate-spin" style={{ color: customization.primaryColor }} />
-            <span className="text-gray-600 font-medium">
-              {store.language === 'ar' ? 'جاري التحميل...' : 'Loading menu...'}
-            </span>
-          </div>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-b sticky top-0 z-50"
-      >
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="text-center mb-6">
-            {customization.logo && (
-              <motion.img
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-                src={customization.logo}
-                alt="Restaurant Logo"
-                className="h-20 w-20 mx-auto mb-4 rounded-full object-cover shadow-lg"
-              />
-            )}
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-2">
-              {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
-            </h1>
-          </div>
-
-          {/* Category Navigation */}
-          <div className="flex gap-3 justify-center flex-wrap">
-            {activeMenu.categories.map((category: any) => (
-              <motion.button
-                key={category.id}
-                onClick={() => scrollToCategory(category.id)}
-                whileTap={{ scale: 0.95 }}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm hover:shadow-md"
-                style={{
-                  backgroundColor: customization.primaryColor,
-                  color: 'white',
-                }}
-              >
-                {store.language === 'ar' ? category.nameAr : category.name}
-              </motion.button>
-            ))}
-          </div>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Minimal Logo Watermark */}
+      {customization.logo && (
+        <div className="fixed top-8 left-8 z-10 opacity-20">
+          <img
+            src={customization.logo}
+            alt="Logo"
+            className="h-12 w-12 rounded-full object-cover"
+          />
         </div>
-      </motion.div>
+      )}
 
-      {/* Menu Content - Single Scroll */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {activeMenu.categories.map((category: any, categoryIndex: number) => (
-          <motion.div
-            key={category.id}
-            id={`category-${category.id}`}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: categoryIndex * 0.1 }}
-            className="mb-16 scroll-mt-32"
-          >
-            {/* Category Header */}
-            <div className="text-center mb-10">
-              <h2 
-                className="text-4xl md:text-5xl font-serif font-bold mb-3"
-                style={{ color: customization.primaryColor }}
-              >
+      {/* Main Content */}
+      <div className="max-w-3xl mx-auto px-8 py-24">
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-32"
+        >
+          <h1 className="text-6xl md:text-7xl font-light tracking-tight mb-4" style={{ color: customization.accentColor }}>
+            {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
+          </h1>
+          <div className="h-px w-24 mx-auto" style={{ backgroundColor: customization.accentColor, opacity: 0.3 }} />
+        </motion.div>
+
+        {/* Categories & Items */}
+        <div className="space-y-24">
+          {activeMenu.categories.map((category: any, catIndex: number) => (
+            <motion.div
+              key={category.id}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: catIndex * 0.1 }}
+            >
+              {/* Category Title */}
+              <h2 className="text-xs tracking-[0.3em] uppercase text-gray-400 mb-12 text-center">
                 {store.language === 'ar' ? category.nameAr : category.name}
               </h2>
-              <div 
-                className="h-1 w-24 mx-auto rounded-full"
-                style={{ backgroundColor: customization.secondaryColor }}
-              />
-            </div>
 
-            {/* Items */}
-            <div className="space-y-6">
-              {category.items.map((item: any, itemIndex: number) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: itemIndex * 0.05 }}
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setItemDetailDialog(true);
-                  }}
-                  className="bg-white border-b border-gray-200 py-6 hover:bg-gray-50 transition-all cursor-pointer group"
-                >
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-2xl font-serif font-bold text-gray-900 group-hover:text-opacity-80 transition-colors">
-                          {store.language === 'ar' ? item.nameAr : item.name}
-                        </h3>
-                        {item.spiceLevel && (
-                          <div className="flex gap-0.5">
-                            {Array.from({ length: item.spiceLevel }).map((_, i) => (
-                              <Flame key={i} className="w-4 h-4 text-red-500" fill="currentColor" />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <p className="text-gray-600 mb-3 leading-relaxed">
-                        {store.language === 'ar' ? item.descriptionAr : item.description}
-                      </p>
+              {/* Items */}
+              <div className="space-y-0">
+                {category.items.map((item: any, itemIndex: number) => {
+                  const isExpanded = expandedItem === item.id;
 
-                      {/* Quick Info */}
-                      <div className="flex flex-wrap gap-3 text-sm">
-                        {item.prepTime && (
-                          <div className="flex items-center gap-1.5 text-gray-500">
-                            <Clock className="w-4 h-4" />
-                            <span>{item.prepTime} {store.language === 'ar' ? 'دقيقة' : 'min'}</span>
-                          </div>
-                        )}
-                        {item.calories && (
-                          <div className="flex items-center gap-1.5 text-gray-500">
-                            <Flame className="w-4 h-4" />
-                            <span>{item.calories} {store.language === 'ar' ? 'سعرة' : 'cal'}</span>
-                          </div>
-                        )}
-                        {item.dietaryTags && item.dietaryTags.length > 0 && (
-                          <div className="flex items-center gap-1.5">
-                            {item.dietaryTags.map((tag: string) => (
-                              <span key={tag} className="text-lg" title={tag}>
-                                {getDietaryIcon(tag)}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-right flex-shrink-0">
-                      <div 
-                        className="text-3xl font-bold mb-1"
-                        style={{ color: customization.secondaryColor }}
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: itemIndex * 0.03 }}
+                      className="border-b border-gray-100"
+                    >
+                      {/* Item Row */}
+                      <button
+                        onClick={() => setExpandedItem(isExpanded ? null : item.id)}
+                        className="w-full py-8 flex items-start justify-between gap-8 hover:bg-gray-50 transition-colors group"
                       >
-                        ${item.price.toFixed(2)}
-                      </div>
-                      {item.sizes && item.sizes.length > 0 && (
-                        <span className="text-xs text-gray-500">
-                          {store.language === 'ar' ? 'أحجام متعددة' : 'Multiple sizes'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="bg-white/90 backdrop-blur-md border-t py-8 text-center">
-        <p className="text-lg text-gray-600 font-serif italic">
-          {store.language === 'ar' ? 'شكراً لزيارتكم' : 'Thank you for dining with us'}
-        </p>
-      </div>
-
-      {/* Floating Complaint Button */}
-      <motion.button
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setComplaintDialog(true)}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white z-50"
-        style={{ backgroundColor: customization.primaryColor }}
-      >
-        <MessageCircle className="w-7 h-7" />
-      </motion.button>
-
-      {/* Item Detail Dialog */}
-      <Dialog open={itemDetailDialog} onOpenChange={setItemDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          {selectedItem && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-3xl font-serif font-bold flex items-center gap-3">
-                  {store.language === 'ar' ? selectedItem.nameAr : selectedItem.name}
-                  {selectedItem.spiceLevel && (
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: selectedItem.spiceLevel }).map((_, i) => (
-                        <Flame key={i} className="w-5 h-5 text-red-500" fill="currentColor" />
-                      ))}
-                    </div>
-                  )}
-                </DialogTitle>
-                <DialogDescription className="text-base mt-2">
-                  {store.language === 'ar' ? selectedItem.descriptionAr : selectedItem.description}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-6 py-4">
-                {/* Price & Quick Info */}
-                <div className="flex items-center gap-6 flex-wrap">
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">
-                      {store.language === 'ar' ? 'السعر' : 'Price'}
-                    </div>
-                    <div className="text-3xl font-bold" style={{ color: customization.secondaryColor }}>
-                      ${selectedItem.price.toFixed(2)}
-                    </div>
-                  </div>
-                  {selectedItem.prepTime && (
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">
-                        {store.language === 'ar' ? 'وقت التحضير' : 'Prep Time'}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-lg font-semibold">
-                        <Clock className="w-5 h-5" />
-                        {selectedItem.prepTime} {store.language === 'ar' ? 'دقيقة' : 'min'}
-                      </div>
-                    </div>
-                  )}
-                  {selectedItem.calories && (
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">
-                        {store.language === 'ar' ? 'السعرات' : 'Calories'}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-lg font-semibold">
-                        <Flame className="w-5 h-5" />
-                        {selectedItem.calories} {store.language === 'ar' ? 'سعرة' : 'cal'}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Ingredients */}
-                {selectedItem.ingredients && selectedItem.ingredients.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'المكونات' : 'Ingredients'}
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {(store.language === 'ar' ? selectedItem.ingredientsAr : selectedItem.ingredients)?.map((ingredient, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-700"
-                        >
-                          {ingredient}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Sizes */}
-                {selectedItem.sizes && selectedItem.sizes.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'الأحجام المتاحة' : 'Available Sizes'}
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {selectedItem.sizes.map((size, i) => (
-                        <div
-                          key={i}
-                          className="p-4 border-2 rounded-lg text-center hover:border-gray-400 transition-colors"
-                        >
-                          <div className="font-semibold text-gray-900">
-                            {store.language === 'ar' ? size.nameAr : size.name}
-                          </div>
-                          <div className="text-lg font-bold mt-1" style={{ color: customization.secondaryColor }}>
-                            ${size.price.toFixed(2)}
-                          </div>
+                        <div className="flex-1 text-left">
+                          <h3 className="text-2xl font-light mb-2 group-hover:translate-x-1 transition-transform" style={{ color: customization.accentColor }}>
+                            {store.language === 'ar' ? item.nameAr : item.name}
+                          </h3>
+                          <p className="text-sm text-gray-500 leading-relaxed">
+                            {store.language === 'ar' ? item.descriptionAr : item.description}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
-                {/* Options */}
-                {selectedItem.options && selectedItem.options.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3">
-                      {store.language === 'ar' ? 'الإضافات' : 'Add-ons'}
-                    </h4>
-                    <div className="space-y-2">
-                      {selectedItem.options.map((option) => (
-                        <div
-                          key={option.id}
-                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                        >
-                          <span className="font-medium">
-                            {store.language === 'ar' ? option.nameAr : option.name}
-                          </span>
-                          <span className="font-bold text-gray-700">
-                            {option.price > 0 ? `+$${option.price.toFixed(2)}` : store.language === 'ar' ? 'مجاناً' : 'Free'}
-                          </span>
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="text-2xl font-light" style={{ color: customization.accentColor }}>
+                            ${item.price.toFixed(2)}
+                          </div>
+                          <motion.div
+                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          </motion.div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      </button>
 
-                {/* Allergens */}
-                {selectedItem.allergens && selectedItem.allergens.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3 text-red-600">
-                      {store.language === 'ar' ? 'مسببات الحساسية' : 'Allergens'}
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {(store.language === 'ar' ? selectedItem.allergensAr : selectedItem.allergens)?.map((allergen, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-sm font-medium text-red-700"
-                        >
-                          {allergen}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      {/* Expanded Details */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-8 pb-8 space-y-6 bg-gray-50">
+                              {/* Ingredients */}
+                              {item.ingredients && item.ingredients.length > 0 && (
+                                <div>
+                                  <div className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-3">
+                                    {store.language === 'ar' ? 'المكونات' : 'Ingredients'}
+                                  </div>
+                                  <div className="text-sm text-gray-600 leading-relaxed">
+                                    {(store.language === 'ar' ? item.ingredientsAr : item.ingredients)?.join(', ')}
+                                  </div>
+                                </div>
+                              )}
 
-                {/* Dietary Tags */}
-                {selectedItem.dietaryTags && selectedItem.dietaryTags.length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                      <Leaf className="w-5 h-5 text-green-600" />
-                      {store.language === 'ar' ? 'معلومات غذائية' : 'Dietary Information'}
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedItem.dietaryTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-sm font-medium text-green-700 capitalize flex items-center gap-1.5"
-                        >
-                          <span>{getDietaryIcon(tag)}</span>
-                          {tag.replace('-', ' ')}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                              {/* Sizes */}
+                              {item.sizes && item.sizes.length > 0 && (
+                                <div>
+                                  <div className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-3">
+                                    {store.language === 'ar' ? 'الأحجام' : 'Sizes'}
+                                  </div>
+                                  <div className="flex gap-4">
+                                    {item.sizes.map((size: any, i: number) => (
+                                      <div key={i} className="flex items-baseline gap-2">
+                                        <span className="text-sm text-gray-600">{store.language === 'ar' ? size.nameAr : size.name}</span>
+                                        <span className="text-lg font-light" style={{ color: customization.accentColor }}>
+                                          ${size.price.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Options */}
+                              {item.options && item.options.length > 0 && (
+                                <div>
+                                  <div className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-3">
+                                    {store.language === 'ar' ? 'الإضافات' : 'Add-ons'}
+                                  </div>
+                                  <div className="space-y-2">
+                                    {item.options.map((option: any) => (
+                                      <div key={option.id} className="flex justify-between text-sm">
+                                        <span className="text-gray-600">{store.language === 'ar' ? option.nameAr : option.name}</span>
+                                        <span style={{ color: customization.accentColor }}>
+                                          {option.price > 0 ? `+$${option.price.toFixed(2)}` : '—'}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Allergens */}
+                              {item.allergens && item.allergens.length > 0 && (
+                                <div>
+                                  <div className="text-xs tracking-[0.2em] uppercase text-red-400 mb-3">
+                                    {store.language === 'ar' ? 'مسببات الحساسية' : 'Allergens'}
+                                  </div>
+                                  <div className="text-sm text-red-600">
+                                    {(store.language === 'ar' ? item.allergensAr : item.allergens)?.join(', ')}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Additional Info */}
+                              <div className="flex gap-6 text-xs text-gray-500">
+                                {item.prepTime && (
+                                  <div>
+                                    <span className="text-gray-400 tracking-[0.2em] uppercase mr-2">
+                                      {store.language === 'ar' ? 'الوقت' : 'Time'}
+                                    </span>
+                                    {item.prepTime}m
+                                  </div>
+                                )}
+                                {item.calories && (
+                                  <div>
+                                    <span className="text-gray-400 tracking-[0.2em] uppercase mr-2">
+                                      {store.language === 'ar' ? 'سعرات' : 'Cal'}
+                                    </span>
+                                    {item.calories}
+                                  </div>
+                                )}
+                                {item.dietaryTags && item.dietaryTags.length > 0 && (
+                                  <div>
+                                    <span className="text-gray-400 tracking-[0.2em] uppercase mr-2">
+                                      {store.language === 'ar' ? 'نوع' : 'Type'}
+                                    </span>
+                                    {item.dietaryTags.join(', ')}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
               </div>
+            </motion.div>
+          ))}
+        </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setItemDetailDialog(false)}>
-                  {store.language === 'ar' ? 'إغلاق' : 'Close'}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+        {/* Footer */}
+        <div className="text-center mt-32 mb-16">
+          <div className="h-px w-24 mx-auto mb-8" style={{ backgroundColor: customization.accentColor, opacity: 0.3 }} />
+          <p className="text-xs tracking-[0.3em] uppercase text-gray-400">
+            {store.language === 'ar' ? 'شكراً' : 'Thank You'}
+          </p>
+        </div>
+      </div>
+
+      {/* Floating Complaint Button - Minimal */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        whileHover={{ scale: 1.05 }}
+        onClick={() => setComplaintDialog(true)}
+        className="fixed bottom-8 right-8 w-12 h-12 rounded-full border-2 flex items-center justify-center z-50 bg-white hover:bg-gray-50 transition-colors"
+        style={{ borderColor: customization.accentColor }}
+      >
+        <MessageCircle className="w-5 h-5" style={{ color: customization.accentColor }} />
+      </motion.button>
 
       {/* Complaint Dialog */}
       <Dialog open={complaintDialog} onOpenChange={setComplaintDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="bg-white">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-2xl font-light" style={{ color: customization.accentColor }}>
               {store.language === 'ar' ? 'إرسال ملاحظة' : 'Send Feedback'}
             </DialogTitle>
-            <DialogDescription>
-              {store.language === 'ar'
-                ? 'نحن نقدر ملاحظاتكم ونسعى لتحسين خدماتنا'
-                : 'We value your feedback and strive to improve our service'}
+            <DialogDescription className="text-gray-500">
+              {store.language === 'ar' ? 'نحن نقدر ملاحظاتكم' : 'We value your feedback'}
             </DialogDescription>
           </DialogHeader>
-
           <form onSubmit={handleComplaintSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">
+              <Label htmlFor="name" className="text-xs tracking-[0.2em] uppercase text-gray-500">
                 {store.language === 'ar' ? 'الاسم' : 'Name'}
               </Label>
               <Input
                 id="name"
                 value={complaintForm.name}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, name: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, name: e.target.value })}
                 required
-                placeholder={store.language === 'ar' ? 'أدخل اسمك' : 'Enter your name'}
+                className="border-gray-200 focus:border-gray-900"
               />
             </div>
-
             <div>
-              <Label htmlFor="email">
+              <Label htmlFor="email" className="text-xs tracking-[0.2em] uppercase text-gray-500">
                 {store.language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={complaintForm.email}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, email: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, email: e.target.value })}
                 required
-                placeholder={store.language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                className="border-gray-200 focus:border-gray-900"
               />
             </div>
-
             <div>
-              <Label htmlFor="phone">
+              <Label htmlFor="phone" className="text-xs tracking-[0.2em] uppercase text-gray-500">
                 {store.language === 'ar' ? 'رقم الهاتف' : 'Phone'}
               </Label>
               <Input
                 id="phone"
                 type="tel"
                 value={complaintForm.phone}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, phone: e.target.value })
-                }
-                placeholder={store.language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone'}
+                onChange={(e) => setComplaintForm({ ...complaintForm, phone: e.target.value })}
+                className="border-gray-200 focus:border-gray-900"
               />
             </div>
-
             <div>
-              <Label htmlFor="message">
+              <Label htmlFor="message" className="text-xs tracking-[0.2em] uppercase text-gray-500">
                 {store.language === 'ar' ? 'الرسالة' : 'Message'}
               </Label>
               <Textarea
                 id="message"
                 value={complaintForm.message}
-                onChange={(e) =>
-                  setComplaintForm({ ...complaintForm, message: e.target.value })
-                }
+                onChange={(e) => setComplaintForm({ ...complaintForm, message: e.target.value })}
                 required
                 rows={4}
-                placeholder={
-                  store.language === 'ar'
-                    ? 'أخبرنا عن تجربتك...'
-                    : 'Tell us about your experience...'
-                }
+                className="border-gray-200 focus:border-gray-900"
               />
             </div>
-
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setComplaintDialog(false)}
                 disabled={submitting}
+                className="border-gray-200"
               >
                 {store.language === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
-                style={{ backgroundColor: customization.primaryColor }}
+                className="text-white"
+                style={{ backgroundColor: customization.accentColor }}
               >
                 {submitting ? (
                   <>
@@ -596,5 +411,5 @@ const ClassicMenu = observer(() => {
   );
 });
 
-export default ClassicMenu;
+export default Minimalist;
 
