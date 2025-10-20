@@ -265,6 +265,12 @@ class RootStore {
         thumbnail: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop',
         description: 'Clean and simple typography-focused',
       },
+      {
+        id: '4',
+        name: 'Colorful Cards',
+        thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop',
+        description: 'Vibrant card-based menu with pastel backgrounds',
+      },
     ];
 
     // Mock Menus with enhanced data
