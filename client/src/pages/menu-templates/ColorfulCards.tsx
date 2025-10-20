@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/contexts/StoreContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,7 @@ const ColorfulCards = observer(() => {
   const store = useStore();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('');
   const [complaintDialog, setComplaintDialog] = useState(false);
   const [complaintForm, setComplaintForm] = useState({
     name: '',
@@ -49,6 +50,26 @@ const ColorfulCards = observer(() => {
     const timer = setTimeout(() => setIsLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (activeMenu?.categories && activeMenu.categories.length > 0) {
+      setActiveCategory(activeMenu.categories[0].id);
+    }
+  }, [activeMenu]);
+
+  const scrollToCategory = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    const element = document.getElementById(`category-${categoryId}`);
+    if (element) {
+      const offset = 120; // Account for sticky header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleComplaintSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +131,7 @@ const ColorfulCards = observer(() => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div 
-        className="relative h-80 flex items-center justify-center overflow-hidden"
+        className="relative h-64 flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: 'url(https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=400&fit=crop)',
           backgroundSize: 'cover',
@@ -121,11 +142,37 @@ const ColorfulCards = observer(() => {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative text-5xl md:text-6xl font-bold text-white text-center px-4"
+          className="relative text-4xl md:text-5xl font-bold text-white text-center px-4"
           style={{ color: customization.primaryColor }}
         >
           {store.language === 'ar' ? activeMenu.nameAr : activeMenu.name}
         </motion.h1>
+      </div>
+
+      {/* Sticky Category Tabs */}
+      <div className="sticky top-0 z-30 bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-2 overflow-x-auto py-4 scrollbar-hide">
+            {activeMenu.categories.map((category: any) => (
+              <button
+                key={category.id}
+                onClick={() => scrollToCategory(category.id)}
+                className={`px-6 py-2 rounded-full font-semibold whitespace-nowrap transition-all ${
+                  activeCategory === category.id
+                    ? 'text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                style={
+                  activeCategory === category.id
+                    ? { backgroundColor: customization.primaryColor }
+                    : {}
+                }
+              >
+                {store.language === 'ar' ? category.nameAr : category.name}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Menu Items Grid */}
@@ -133,11 +180,12 @@ const ColorfulCards = observer(() => {
         {activeMenu.categories.map((category: any, catIndex: number) => (
           <motion.div
             key={category.id}
+            id={`category-${category.id}`}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: catIndex * 0.1 }}
-            className="mb-16"
+            className="mb-16 scroll-mt-32"
           >
             {/* Category Title */}
             <h2 
@@ -161,11 +209,11 @@ const ColorfulCards = observer(() => {
                     transition={{ delay: itemIndex * 0.05 }}
                     whileHover={{ scale: 1.03, y: -5 }}
                     onClick={() => setSelectedItem(item)}
-                    className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 aspect-square"
+                    className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 aspect-square flex flex-col items-center justify-center p-6"
                     style={{ backgroundColor: bgColor }}
                   >
                     {/* Product Image */}
-                    <div className="absolute inset-0 flex items-center justify-center p-8">
+                    <div className="w-full h-2/3 flex items-center justify-center mb-4">
                       <img
                         src={item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop'}
                         alt={item.name}
@@ -174,12 +222,10 @@ const ColorfulCards = observer(() => {
                       />
                     </div>
 
-                    {/* Item Name Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                      <h3 className="text-xl font-bold text-white text-center">
-                        {store.language === 'ar' ? item.nameAr : item.name}
-                      </h3>
-                    </div>
+                    {/* Item Name - Centered */}
+                    <h3 className="text-xl font-bold text-gray-800 text-center">
+                      {store.language === 'ar' ? item.nameAr : item.name}
+                    </h3>
                   </motion.button>
                 );
               })}
@@ -188,7 +234,7 @@ const ColorfulCards = observer(() => {
         ))}
       </div>
 
-      {/* Item Detail Modal */}
+      {/* Simplified Item Detail Modal */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
@@ -203,7 +249,7 @@ const ColorfulCards = observer(() => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+              className="bg-white rounded-2xl max-w-lg w-full relative overflow-hidden"
             >
               {/* Close Button */}
               <button
@@ -222,15 +268,15 @@ const ColorfulCards = observer(() => {
                 />
               </div>
 
-              {/* Item Details */}
+              {/* Item Details - Simplified */}
               <div className="p-8">
                 {/* Name and Price */}
-                <div className="flex items-start justify-between mb-6">
-                  <h2 className="text-3xl font-bold text-gray-900">
+                <div className="flex items-start justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">
                     {store.language === 'ar' ? selectedItem.nameAr : selectedItem.name}
                   </h2>
                   <div 
-                    className="text-3xl font-bold ml-4"
+                    className="text-2xl font-bold ml-4"
                     style={{ color: customization.primaryColor }}
                   >
                     ${selectedItem.price.toFixed(2)}
@@ -242,10 +288,10 @@ const ColorfulCards = observer(() => {
                   {store.language === 'ar' ? selectedItem.descriptionAr : selectedItem.description}
                 </p>
 
-                {/* Sizes */}
+                {/* Sizes - Only if available */}
                 {selectedItem.sizes && selectedItem.sizes.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
                       {store.language === 'ar' ? 'الأحجام' : 'Sizes'}
                     </h3>
                     <div className="grid grid-cols-3 gap-3">
@@ -255,7 +301,7 @@ const ColorfulCards = observer(() => {
                           className="border-2 rounded-lg p-3 text-center hover:border-current transition-colors cursor-pointer"
                           style={{ borderColor: customization.primaryColor + '40' }}
                         >
-                          <div className="font-semibold text-gray-900">
+                          <div className="font-semibold text-gray-900 text-sm">
                             {store.language === 'ar' ? size.nameAr : size.name}
                           </div>
                           <div 
@@ -269,66 +315,6 @@ const ColorfulCards = observer(() => {
                     </div>
                   </div>
                 )}
-
-                {/* Options/Add-ons */}
-                {selectedItem.options && selectedItem.options.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {store.language === 'ar' ? 'الإضافات' : 'Add-ons'}
-                    </h3>
-                    <div className="space-y-2">
-                      {selectedItem.options.map((option: any) => (
-                        <div
-                          key={option.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
-                        >
-                          <span className="font-medium text-gray-900">
-                            {store.language === 'ar' ? option.nameAr : option.name}
-                          </span>
-                          <span 
-                            className="font-bold"
-                            style={{ color: customization.primaryColor }}
-                          >
-                            {option.price > 0 ? `+$${option.price.toFixed(2)}` : 'Free'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Additional Info */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
-                  {selectedItem.prepTime && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="font-semibold">
-                        {store.language === 'ar' ? 'وقت التحضير:' : 'Prep Time:'}
-                      </span>
-                      <span>{selectedItem.prepTime}m</span>
-                    </div>
-                  )}
-                  {selectedItem.calories && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="font-semibold">
-                        {store.language === 'ar' ? 'السعرات:' : 'Calories:'}
-                      </span>
-                      <span>{selectedItem.calories}</span>
-                    </div>
-                  )}
-                  {selectedItem.dietaryTags && selectedItem.dietaryTags.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      {selectedItem.dietaryTags.map((tag: string, i: number) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 rounded-full text-white font-medium"
-                          style={{ backgroundColor: customization.primaryColor }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
             </motion.div>
           </motion.div>
