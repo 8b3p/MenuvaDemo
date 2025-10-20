@@ -46,6 +46,9 @@ const Minimalist = observer(() => {
     setSubmitting(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     store.addComplaint({
+      id: Date.now().toString(),
+      status: "pending" as const,
+      date: new Date().toISOString().split("T")[0],
       customerName: complaintForm.name,
       email: complaintForm.email,
       phone: complaintForm.phone,
