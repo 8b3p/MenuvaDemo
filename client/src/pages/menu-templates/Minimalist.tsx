@@ -30,7 +30,8 @@ const Minimalist = observer(() => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const activeMenu = store.menus[0];
+  // Get the first menu with populated data (categories and items)
+  const activeMenu = store.menus.length > 0 ? store.getMenuWithData(store.menus[0].id) : null;
   const customization = {
     accentColor: store.templateCustomization.primaryColor || '#000000',
     logo: store.templateCustomization.logo,

@@ -32,7 +32,8 @@ const ModernGrid = observer(() => {
   const [submitting, setSubmitting] = useState(false);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
 
-  const activeMenu = store.menus[0];
+  // Get the first menu with populated data (categories and items)
+  const activeMenu = store.menus.length > 0 ? store.getMenuWithData(store.menus[0].id) : null;
   const customization = {
     primaryColor: store.templateCustomization.primaryColor || '#FF6B6B',
     secondaryColor: store.templateCustomization.secondaryColor || '#4ECDC4',

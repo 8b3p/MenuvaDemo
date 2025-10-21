@@ -35,6 +35,9 @@ export interface Item {
   options?: MenuItemOption[];
 }
 
+// Type alias for backward compatibility
+export type MenuItem = Item;
+
 // Global Category (in the category pool)
 export interface Category {
   id: string;
@@ -72,6 +75,8 @@ export interface Template {
   nameAr: string;
   slug: string;
   thumbnail: string;
+  description?: string;
+  descriptionAr?: string;
 }
 
 export interface Complaint {
@@ -302,6 +307,35 @@ class RootStore {
       { id: 'item-18', name: 'Mojito', nameAr: 'موهيتو', description: 'Refreshing mint and lime cocktail', descriptionAr: 'كوكتيل منعش بالنعناع والليمون', price: 8.99, image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a', ingredients: ['Mint', 'Lime', 'Soda Water', 'Sugar'], allergens: [], dietaryTags: ['vegan', 'gluten-free', 'dairy-free'], prepTime: 5, calories: 150 },
       { id: 'item-19', name: 'Lemonade', nameAr: 'ليمونادة', description: 'Fresh homemade lemonade', descriptionAr: 'ليمونادة منزلية طازجة', price: 4.99, image: 'https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9d', ingredients: ['Lemon', 'Sugar', 'Water', 'Ice'], allergens: [], dietaryTags: ['vegan', 'gluten-free', 'dairy-free'], prepTime: 5, calories: 130 },
       { id: 'item-20', name: 'Cappuccino', nameAr: 'كابتشينو', description: 'Espresso with steamed milk foam', descriptionAr: 'إسبريسو مع رغوة الحليب', price: 5.99, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d', ingredients: ['Espresso', 'Steamed Milk', 'Milk Foam'], allergens: ['Dairy'], dietaryTags: ['vegetarian'], prepTime: 5, calories: 140 },
+      // Additional Appetizers
+      { id: 'item-21', name: 'Calamari Fritti', nameAr: 'كالاماري مقلي', description: 'Crispy fried calamari with marinara sauce', descriptionAr: 'كالاماري مقرمش مع صلصة مارينارا', price: 13.99, image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0', ingredients: ['Squid', 'Flour', 'Lemon', 'Marinara Sauce'], allergens: ['Gluten', 'Shellfish'], prepTime: 15, calories: 420 },
+      { id: 'item-22', name: 'Spinach Artichoke Dip', nameAr: 'صلصة السبانخ والخرشوف', description: 'Creamy dip served with tortilla chips', descriptionAr: 'صلصة كريمية تقدم مع رقائق التورتيلا', price: 10.99, image: 'https://images.unsplash.com/photo-1541529086526-db283c563270', ingredients: ['Spinach', 'Artichoke', 'Cream Cheese', 'Parmesan'], allergens: ['Dairy', 'Gluten'], dietaryTags: ['vegetarian'], prepTime: 12, calories: 380 },
+      { id: 'item-23', name: 'Mozzarella Sticks', nameAr: 'أصابع الموزاريلا', description: 'Golden fried mozzarella with ranch dressing', descriptionAr: 'موزاريلا مقلية ذهبية مع صلصة رانش', price: 9.99, image: 'https://images.unsplash.com/photo-1531749668029-2db88e4276c7', ingredients: ['Mozzarella', 'Breadcrumbs', 'Ranch Dressing'], allergens: ['Dairy', 'Gluten'], dietaryTags: ['vegetarian'], prepTime: 12, calories: 450 },
+      { id: 'item-24', name: 'Nachos Supreme', nameAr: 'ناتشوز سوبريم', description: 'Loaded nachos with cheese, jalapeños, and sour cream', descriptionAr: 'ناتشوز محملة بالجبن والهالبينو والكريمة الحامضة', price: 12.99, image: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d', ingredients: ['Tortilla Chips', 'Cheddar', 'Jalapeños', 'Sour Cream', 'Guacamole'], allergens: ['Dairy', 'Gluten'], dietaryTags: ['vegetarian'], spiceLevel: 3, prepTime: 10, calories: 680 },
+      { id: 'item-25', name: 'Spring Rolls', nameAr: 'سبرينغ رول', description: 'Crispy vegetable spring rolls with sweet chili sauce', descriptionAr: 'سبرينغ رول خضار مقرمش مع صلصة الفلفل الحلو', price: 8.99, image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d', ingredients: ['Cabbage', 'Carrots', 'Rice Paper', 'Sweet Chili Sauce'], allergens: ['Gluten'], dietaryTags: ['vegan'], prepTime: 8, calories: 240 },
+      // Additional Main Courses
+      { id: 'item-26', name: 'Lamb Chops', nameAr: 'قطع لحم الخروف', description: 'Grilled lamb chops with rosemary and garlic', descriptionAr: 'قطع لحم خروف مشوية مع إكليل الجبل والثوم', price: 34.99, image: 'https://images.unsplash.com/photo-1595777216528-071e0127ccbf', ingredients: ['Lamb', 'Rosemary', 'Garlic', 'Olive Oil'], allergens: [], dietaryTags: ['gluten-free'], prepTime: 28, calories: 720 },
+      { id: 'item-27', name: 'Seafood Paella', nameAr: 'بايلا المأكولات البحرية', description: 'Spanish rice dish with mixed seafood', descriptionAr: 'طبق أرز إسباني مع مأكولات بحرية متنوعة', price: 26.99, image: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a', ingredients: ['Rice', 'Shrimp', 'Mussels', 'Squid', 'Saffron'], allergens: ['Shellfish'], dietaryTags: ['gluten-free'], prepTime: 35, calories: 650 },
+      { id: 'item-28', name: 'BBQ Ribs', nameAr: 'أضلاع باربيكيو', description: 'Slow-cooked pork ribs with BBQ sauce', descriptionAr: 'أضلاع خنزير مطبوخة ببطء مع صلصة باربيكيو', price: 22.99, image: 'https://images.unsplash.com/photo-1544025162-d76694265947', ingredients: ['Pork Ribs', 'BBQ Sauce', 'Spices'], allergens: [], prepTime: 40, calories: 850 },
+      { id: 'item-29', name: 'Vegetable Stir Fry', nameAr: 'خضار مقلية', description: 'Mixed vegetables in savory Asian sauce', descriptionAr: 'خضروات مشكلة في صلصة آسيوية لذيذة', price: 14.99, image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19', ingredients: ['Broccoli', 'Bell Peppers', 'Carrots', 'Soy Sauce', 'Ginger'], allergens: ['Soy'], dietaryTags: ['vegan', 'dairy-free'], prepTime: 15, calories: 280 },
+      { id: 'item-30', name: 'Chicken Tikka Masala', nameAr: 'دجاج تيكا ماسالا', description: 'Tender chicken in creamy tomato curry sauce', descriptionAr: 'دجاج طري في صلصة كاري الطماطم الكريمية', price: 18.99, image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641', ingredients: ['Chicken', 'Tomatoes', 'Cream', 'Curry Spices', 'Rice'], allergens: ['Dairy'], spiceLevel: 3, prepTime: 30, calories: 580 },
+      { id: 'item-31', name: 'Fish and Chips', nameAr: 'سمك وبطاطس', description: 'Beer-battered fish with crispy fries', descriptionAr: 'سمك مقلي مع بطاطس مقرمشة', price: 17.99, image: 'https://images.unsplash.com/photo-1579208575657-c595a05383b7', ingredients: ['Cod', 'Beer Batter', 'Potatoes', 'Tartar Sauce'], allergens: ['Fish', 'Gluten'], prepTime: 22, calories: 720 },
+      { id: 'item-32', name: 'Mushroom Risotto', nameAr: 'ريزوتو الفطر', description: 'Creamy Italian rice with wild mushrooms', descriptionAr: 'أرز إيطالي كريمي مع فطر بري', price: 19.99, image: 'https://images.unsplash.com/photo-1476124369491-f51a92e5bb3d', ingredients: ['Arborio Rice', 'Mushrooms', 'Parmesan', 'White Wine', 'Butter'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 28, calories: 520 },
+      { id: 'item-33', name: 'Beef Tacos', nameAr: 'تاكو لحم البقر', description: 'Three soft tacos with seasoned beef and toppings', descriptionAr: 'ثلاثة تاكو طرية مع لحم بقري متبل وإضافات', price: 13.99, image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47', ingredients: ['Beef', 'Tortillas', 'Lettuce', 'Cheese', 'Salsa'], allergens: ['Dairy', 'Gluten'], spiceLevel: 2, prepTime: 18, calories: 540 },
+      { id: 'item-34', name: 'Sushi Platter', nameAr: 'طبق سوشي', description: 'Assorted sushi rolls with wasabi and ginger', descriptionAr: 'لفائف سوشي متنوعة مع الواسابي والزنجبيل', price: 24.99, image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351', ingredients: ['Rice', 'Salmon', 'Tuna', 'Avocado', 'Nori'], allergens: ['Fish'], dietaryTags: ['gluten-free'], prepTime: 25, calories: 480 },
+      // Additional Desserts
+      { id: 'item-35', name: 'Crème Brûlée', nameAr: 'كريم بروليه', description: 'Classic French custard with caramelized sugar', descriptionAr: 'كاسترد فرنسي كلاسيكي مع سكر كراميل', price: 9.99, image: 'https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc', ingredients: ['Cream', 'Egg Yolks', 'Sugar', 'Vanilla'], allergens: ['Dairy', 'Eggs'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 18, calories: 360 },
+      { id: 'item-36', name: 'Apple Pie', nameAr: 'فطيرة التفاح', description: 'Homemade apple pie with vanilla ice cream', descriptionAr: 'فطيرة تفاح منزلية مع آيس كريم الفانيليا', price: 8.99, image: 'https://images.unsplash.com/photo-1535920527002-b35e96722eb9', ingredients: ['Apples', 'Pie Crust', 'Cinnamon', 'Vanilla Ice Cream'], allergens: ['Gluten', 'Dairy', 'Eggs'], dietaryTags: ['vegetarian'], prepTime: 12, calories: 480 },
+      { id: 'item-37', name: 'Panna Cotta', nameAr: 'بانا كوتا', description: 'Italian cream dessert with berry compote', descriptionAr: 'حلوى كريمة إيطالية مع كومبوت التوت', price: 8.99, image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777', ingredients: ['Cream', 'Gelatin', 'Sugar', 'Berries'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 15, calories: 320 },
+      { id: 'item-38', name: 'Brownie Sundae', nameAr: 'براوني صنداي', description: 'Warm chocolate brownie with ice cream and fudge', descriptionAr: 'براوني شوكولاتة دافئ مع آيس كريم وفدج', price: 9.99, image: 'https://images.unsplash.com/photo-1515037893149-de7f840978e2', ingredients: ['Brownie', 'Vanilla Ice Cream', 'Chocolate Fudge', 'Whipped Cream'], allergens: ['Gluten', 'Dairy', 'Eggs'], dietaryTags: ['vegetarian'], prepTime: 8, calories: 620 },
+      // Additional Beverages
+      { id: 'item-39', name: 'Green Tea', nameAr: 'شاي أخضر', description: 'Premium Japanese green tea', descriptionAr: 'شاي أخضر ياباني فاخر', price: 3.99, image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc', ingredients: ['Green Tea Leaves', 'Hot Water'], allergens: [], dietaryTags: ['vegan', 'gluten-free', 'dairy-free'], prepTime: 3, calories: 5 },
+      { id: 'item-40', name: 'Mango Smoothie', nameAr: 'سموذي المانجو', description: 'Fresh mango blended with yogurt and honey', descriptionAr: 'مانجو طازج ممزوج مع الزبادي والعسل', price: 6.99, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625', ingredients: ['Mango', 'Yogurt', 'Honey', 'Ice'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 5, calories: 220 },
+      { id: 'item-41', name: 'Espresso', nameAr: 'إسبريسو', description: 'Strong Italian coffee shot', descriptionAr: 'قهوة إيطالية قوية', price: 3.99, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04', ingredients: ['Espresso Beans'], allergens: [], dietaryTags: ['vegan', 'gluten-free', 'dairy-free'], prepTime: 2, calories: 5 },
+      { id: 'item-42', name: 'Strawberry Milkshake', nameAr: 'ميلك شيك الفراولة', description: 'Creamy strawberry milkshake with whipped cream', descriptionAr: 'ميلك شيك فراولة كريمي مع كريمة مخفوقة', price: 6.99, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699', ingredients: ['Strawberries', 'Milk', 'Ice Cream', 'Whipped Cream'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 5, calories: 380 },
+      { id: 'item-43', name: 'Iced Matcha Latte', nameAr: 'ماتشا لاتيه مثلج', description: 'Refreshing matcha green tea with milk', descriptionAr: 'شاي ماتشا أخضر منعش مع الحليب', price: 5.99, image: 'https://images.unsplash.com/photo-1536013564761-2a1c88d3a7c4', ingredients: ['Matcha Powder', 'Milk', 'Ice', 'Honey'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 4, calories: 180 },
+      { id: 'item-44', name: 'Hot Chocolate', nameAr: 'شوكولاتة ساخنة', description: 'Rich hot chocolate with marshmallows', descriptionAr: 'شوكولاتة ساخنة غنية مع مارشميلو', price: 4.99, image: 'https://images.unsplash.com/photo-1517578239113-b03992dcdd25', ingredients: ['Cocoa', 'Milk', 'Sugar', 'Marshmallows'], allergens: ['Dairy'], dietaryTags: ['vegetarian', 'gluten-free'], prepTime: 5, calories: 280 },
+      { id: 'item-45', name: 'Sparkling Water', nameAr: 'ماء فوار', description: 'Refreshing sparkling mineral water', descriptionAr: 'ماء معدني فوار منعش', price: 2.99, image: 'https://images.unsplash.com/photo-1523362628745-0c100150b504', ingredients: ['Sparkling Water'], allergens: [], dietaryTags: ['vegan', 'gluten-free', 'dairy-free'], prepTime: 1, calories: 0 },
     ];
 
     // Categories
@@ -321,10 +355,10 @@ class RootStore {
         description: 'Our complete menu selection',
         descriptionAr: 'مجموعة قائمتنا الكاملة',
         categoryOrder: [
-          { categoryId: 'cat-1', itemIds: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5'] },
-          { categoryId: 'cat-2', itemIds: ['item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11'] },
-          { categoryId: 'cat-3', itemIds: ['item-12', 'item-13', 'item-14', 'item-15'] },
-          { categoryId: 'cat-4', itemIds: ['item-16', 'item-17', 'item-18', 'item-19', 'item-20'] },
+          { categoryId: 'cat-1', itemIds: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-21', 'item-22', 'item-23', 'item-24', 'item-25'] },
+          { categoryId: 'cat-2', itemIds: ['item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-26', 'item-27', 'item-28', 'item-29', 'item-30', 'item-31', 'item-32', 'item-33', 'item-34'] },
+          { categoryId: 'cat-3', itemIds: ['item-12', 'item-13', 'item-14', 'item-15', 'item-35', 'item-36', 'item-37', 'item-38'] },
+          { categoryId: 'cat-4', itemIds: ['item-16', 'item-17', 'item-18', 'item-19', 'item-20', 'item-39', 'item-40', 'item-41', 'item-42', 'item-43', 'item-44', 'item-45'] },
         ],
       },
       {

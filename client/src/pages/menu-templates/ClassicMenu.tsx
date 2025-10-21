@@ -32,7 +32,8 @@ const ClassicMenu = observer(() => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const activeMenu = store.menus[0];
+  // Get the first menu with populated data (categories and items)
+  const activeMenu = store.menus.length > 0 ? store.getMenuWithData(store.menus[0].id) : null;
   const customization = {
     primaryColor: store.templateCustomization.primaryColor || '#D4AF37',
     secondaryColor: store.templateCustomization.secondaryColor || '#8B7355',

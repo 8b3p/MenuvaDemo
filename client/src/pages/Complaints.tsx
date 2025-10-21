@@ -97,7 +97,7 @@ const Complaints = observer(() => {
   };
 
   const handleStatusChange = (complaintId: string, newStatus: 'pending' | 'in-progress' | 'resolved') => {
-    store.updateComplaintStatus(complaintId, newStatus);
+    store.updateComplaint(complaintId, { status: newStatus });
   };
 
   const stats = {

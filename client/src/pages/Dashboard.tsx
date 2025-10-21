@@ -242,11 +242,7 @@ const Dashboard = observer(() => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-                {store.menus.reduce(
-                  (acc, menu) =>
-                    acc + menu.categories.reduce((catAcc: any, cat: any) => catAcc + cat.items.length, 0),
-                  0
-                )}
+                {store.items.length}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 {isArabic ? 'عبر جميع القوائم' : 'Across all menus'}
