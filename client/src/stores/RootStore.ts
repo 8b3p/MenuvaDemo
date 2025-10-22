@@ -381,9 +381,9 @@ class RootStore {
     // Templates
     this.templates = [
       { id: '1', name: 'Fine Dining', nameAr: 'الطعام الفاخر', slug: 'fine-dining', thumbnail: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0' },
-      { id: '2', name: 'Modern', nameAr: 'الحديث', slug: 'modern', thumbnail: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836' },
-      { id: '3', name: 'Minimalist', nameAr: 'البسيط', slug: 'minimalist', thumbnail: 'https://images.unsplash.com/photo-1559339352-11d035aa65de' },
-      { id: '4', name: 'Coffee Shop', nameAr: 'مقهى', slug: 'coffee-shop', thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' },
+      { id: '2', name: 'Modern', nameAr: 'الحديث', slug: 'modern', thumbnail: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b' },
+      { id: '3', name: 'Minimalist', nameAr: 'البسيط', slug: 'minimalist', thumbnail: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add' },
+      { id: '4', name: 'Coffee Shop', nameAr: 'مقهى', slug: 'coffee-shop', thumbnail: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb' },
     ];
 
     // Mock complaints

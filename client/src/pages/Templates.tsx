@@ -97,7 +97,7 @@ const Templates = observer(() => {
           return (
             <Card
               key={template.id}
-              className={`hover:shadow-lg transition-all ${isActive ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
+              className={`pt-0 hover:shadow-lg transition-all ${isActive ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
                 }`}
             >
               <CardHeader className="p-0">
