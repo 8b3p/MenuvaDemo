@@ -336,7 +336,26 @@ const Templates = observer(() => {
               {/* QR Code */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <QRCodeSVG
-                  value={`${window.location.origin}/menu/${selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : selectedTemplate?.id === '3' ? 'minimalist' : selectedTemplate?.id === '4' ? 'colorful' : 'classic'}`}
+                  value={(() => {
+                    let menuPath: string;
+                    switch (selectedTemplate?.id) {
+                      case '1':
+                        menuPath = "https://nozomi.redro.menu/en/restaurant/riyadh.html";
+                        break;
+                      case '2':
+                        menuPath = "https://www.partybox.sa/";
+                        break;
+                      case '3':
+                        menuPath = "https://daylong.sa/menu/";
+                        break;
+                      case '4':
+                        menuPath = "https://www.dutchbros.com/menu/";
+                        break;
+                      default:
+                        menuPath = "https://nozomi.redro.menu/en/restaurant/riyadh.html";
+                    }
+                    return menuPath;
+                  })()}
                   size={180}
                   level="H"
                   includeMargin={true}
