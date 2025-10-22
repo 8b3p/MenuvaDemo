@@ -82,7 +82,9 @@ const Templates = observer(() => {
                   {isArabic ? 'القالب النشط' : 'Active Template'}
                 </p>
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  {store.templates.find((t: any) => t.id === store.activeTemplateId)?.name}
+                  {isArabic 
+                    ? store.templates.find((t: any) => t.id === store.activeTemplateId)?.nameAr
+                    : store.templates.find((t: any) => t.id === store.activeTemplateId)?.name}
                 </p>
               </div>
             </div>
@@ -104,7 +106,7 @@ const Templates = observer(() => {
                 <div className="relative">
                   <img
                     src={template.thumbnail}
-                    alt={template.name}
+                    alt={isArabic ? template.nameAr : template.name}
                     className="w-full h-48 object-cover rounded-t-lg"
                   />
                   {isActive && (
@@ -116,7 +118,7 @@ const Templates = observer(() => {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <CardTitle className="mb-2">{template.name}</CardTitle>
+                <CardTitle className="mb-2">{isArabic ? template.nameAr : template.name}</CardTitle>
                 <p className="text-sm text-muted-foreground mb-4">{template.description}</p>
                 <div className="flex gap-2">
                   <Button
@@ -308,7 +310,7 @@ const Templates = observer(() => {
       <Dialog open={previewDialog} onOpenChange={setPreviewDialog}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{selectedTemplate?.name}</DialogTitle>
+            <DialogTitle>{isArabic ? selectedTemplate?.nameAr : selectedTemplate?.name}</DialogTitle>
             <DialogDescription>{selectedTemplate?.description}</DialogDescription>
           </DialogHeader>
 
@@ -317,7 +319,7 @@ const Templates = observer(() => {
             <div className="aspect-video rounded-lg overflow-hidden border">
               <img
                 src={selectedTemplate?.thumbnail}
-                alt={selectedTemplate?.name}
+                alt={isArabic ? selectedTemplate?.nameAr : selectedTemplate?.name}
                 className="w-full h-full object-cover"
               />
             </div>

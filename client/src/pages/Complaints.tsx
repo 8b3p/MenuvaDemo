@@ -34,6 +34,22 @@ const Complaints = observer(() => {
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [detailsDialog, setDetailsDialog] = useState(false);
 
+  // Category translation mapping
+  const getCategoryName = (category: string) => {
+    const categoryMap: { [key: string]: { en: string; ar: string } } = {
+      'Food Quality': { en: 'Food Quality', ar: 'جودة الطعام' },
+      'Service': { en: 'Service', ar: 'الخدمة' },
+      'Compliment': { en: 'Compliment', ar: 'إطراء' },
+      'Delivery': { en: 'Delivery', ar: 'التوصيل' },
+      'Pricing': { en: 'Pricing', ar: 'التسعير' },
+      'Hygiene': { en: 'Hygiene', ar: 'النظافة' },
+      'Staff': { en: 'Staff', ar: 'الموظفين' },
+      'Other': { en: 'Other', ar: 'أخرى' },
+    };
+
+    return isArabic ? (categoryMap[category]?.ar || category) : (categoryMap[category]?.en || category);
+  };
+
   // Get unique categories
   const categories = useMemo(() => {
     const cats = new Set(store.complaints.map((c) => c.category));
@@ -109,48 +125,6 @@ const Complaints = observer(() => {
 
   return (
     <div className="space-y-6">
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-1">
-              {isArabic ? 'إجمالي الشكاوى' : 'Total Complaints'}
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-1">
-              {isArabic ? 'معلقة' : 'Pending'}
-            </p>
-            <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-              {stats.pending}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-1">
-              {isArabic ? 'قيد المعالجة' : 'In Progress'}
-            </p>
-            <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-              {stats.inProgress}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground mb-1">
-              {isArabic ? 'تم الحل' : 'Resolved'}
-            </p>
-            <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-              {stats.resolved}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Filters */}
       <Card>
         <CardContent className="p-6">
@@ -202,12 +176,20 @@ const Complaints = observer(() => {
                   <SelectItem value="all">{isArabic ? 'الكل' : 'All'}</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {cat}
+                      {getCategoryName(cat)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          
+          {/* Compact Stats */}
+          <div className="flex items-center gap-6 mt-4 pt-4 border-t text-sm text-muted-foreground">
+            <span>{isArabic ? 'الإجمالي:' : 'Total:'} <strong className="text-foreground">{stats.total}</strong></span>
+            <span>{isArabic ? 'معلقة:' : 'Pending:'} <strong className="text-yellow-600">{stats.pending}</strong></span>
+            <span>{isArabic ? 'قيد المعالجة:' : 'In Progress:'} <strong className="text-blue-600">{stats.inProgress}</strong></span>
+            <span>{isArabic ? 'تم الحل:' : 'Resolved:'} <strong className="text-green-600">{stats.resolved}</strong></span>
           </div>
         </CardContent>
       </Card>
@@ -225,48 +207,45 @@ const Complaints = observer(() => {
           </Card>
         ) : (
           filteredComplaints.map((complaint) => (
-            <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+            <Card key={complaint.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-base text-gray-900 dark:text-white truncate">
                         {complaint.customerName}
                       </h3>
                       {getStatusBadge(complaint.status)}
-                      <Badge variant="outline" className="flex items-center gap-1">
+                      <Badge variant="outline" className="flex items-center gap-1 text-xs">
                         <Tag className="w-3 h-3" />
-                        {complaint.category}
+                        {getCategoryName(complaint.category)}
                       </Badge>
                     </div>
 
-                    <p className="text-gray-700 dark:text-gray-300 line-clamp-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 mb-2">
                       {complaint.message}
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
-                        <Mail className="w-4 h-4" />
-                        {complaint.email}
+                        <Mail className="w-3 h-3" />
+                        <span className="truncate max-w-[150px]">{complaint.email}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Phone className="w-4 h-4" />
-                        {complaint.phone}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-3 h-3" />
                         {formatDate(complaint.date)}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleViewDetails(complaint)}
+                      className="h-8 px-3"
                     >
-                      <Eye className="w-4 h-4 mr-2" />
+                      <Eye className="w-3 h-3 mr-1" />
                       {isArabic ? 'عرض' : 'View'}
                     </Button>
                     <Select
@@ -275,7 +254,7 @@ const Complaints = observer(() => {
                         handleStatusChange(complaint.id, value as 'pending' | 'in-progress' | 'resolved')
                       }
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[120px] h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -341,7 +320,7 @@ const Complaints = observer(() => {
                   <Label className="text-sm font-semibold text-muted-foreground">
                     {isArabic ? 'الفئة' : 'Category'}
                   </Label>
-                  <p className="text-base mt-1">{selectedComplaint.category}</p>
+                  <p className="text-base mt-1">{getCategoryName(selectedComplaint.category)}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-semibold text-muted-foreground">
