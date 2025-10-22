@@ -97,9 +97,8 @@ const Templates = observer(() => {
           return (
             <Card
               key={template.id}
-              className={`hover:shadow-lg transition-all ${
-                isActive ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
-              }`}
+              className={`hover:shadow-lg transition-all ${isActive ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
+                }`}
             >
               <CardHeader className="p-0">
                 <div className="relative">
@@ -312,7 +311,7 @@ const Templates = observer(() => {
             <DialogTitle>{selectedTemplate?.name}</DialogTitle>
             <DialogDescription>{selectedTemplate?.description}</DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Template Preview */}
             <div className="aspect-video rounded-lg overflow-hidden border">
@@ -322,7 +321,7 @@ const Templates = observer(() => {
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             {/* QR Code and Link */}
             <div className="flex flex-col items-center justify-center gap-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <div className="text-center mb-2">
@@ -333,7 +332,7 @@ const Templates = observer(() => {
                   {isArabic ? 'امسح للعرض على الهاتف المحمول' : 'Scan to view on mobile'}
                 </p>
               </div>
-              
+
               {/* QR Code */}
               <div className="bg-white p-4 rounded-lg shadow-sm">
                 <QRCodeSVG
@@ -343,14 +342,30 @@ const Templates = observer(() => {
                   includeMargin={true}
                 />
               </div>
-              
+
               {/* Direct Link */}
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => {
-                  const menuPath = selectedTemplate?.id === '1' ? 'classic' : selectedTemplate?.id === '2' ? 'modern' : selectedTemplate?.id === '3' ? 'minimalist' : selectedTemplate?.id === '4' ? 'colorful' : 'classic';
-                  window.open(`/menu/${menuPath}`, '_blank');
+                  let menuPath: string;
+                  switch (selectedTemplate?.id) {
+                    case '1':
+                      menuPath = "https://nozomi.redro.menu/en/restaurant/riyadh.html";
+                      break;
+                    case '2':
+                      menuPath = "https://www.partybox.sa/";
+                      break;
+                    case '3':
+                      menuPath = "https://daylong.sa/menu/";
+                      break;
+                    case '4':
+                      menuPath = "https://www.dutchbros.com/menu/";
+                      break;
+                    default:
+                      menuPath = "https://nozomi.redro.menu/en/restaurant/riyadh.html";
+                  }
+                  window.open(menuPath, '_blank');
                 }}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
@@ -358,7 +373,7 @@ const Templates = observer(() => {
               </Button>
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setPreviewDialog(false)}>
               {isArabic ? 'إغلاق' : 'Close'}
