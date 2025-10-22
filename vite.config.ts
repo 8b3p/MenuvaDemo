@@ -3,10 +3,26 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
+// Custom plugin to replace environment variables in HTML
+const htmlEnvReplace = (): Plugin => ({
+  name: 'html-env-replace',
+  transformIndexHtml(html: string) {
+    // Get environment variables
+    const env = process.env;
+    
+    // Replace environment variable placeholders
+    return html
+      .replace('%VITE_APP_TITLE%', env.VITE_APP_TITLE || 'Menuva')
+      .replace('%VITE_APP_LOGO%', env.VITE_APP_LOGO || '')
+      .replace('%VITE_ANALYTICS_ENDPOINT%', env.VITE_ANALYTICS_ENDPOINT || '')
+      .replace('%VITE_ANALYTICS_WEBSITE_ID%', env.VITE_ANALYTICS_WEBSITE_ID || '');
+  },
+});
+
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), htmlEnvReplace()];
 
 export default defineConfig({
   plugins,
