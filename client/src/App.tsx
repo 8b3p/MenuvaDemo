@@ -19,40 +19,41 @@ import ColorfulCards from "./pages/menu-templates/ColorfulCards";
 
 function Router() {
   const [location] = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
-    <Switch location={location}>
-      <Route path="/" component={Login} />
-      <Route path="/login" component={Login} />
-      <Route path="/dashboard">
-        <DashboardLayout>
-          <Dashboard />
-        </DashboardLayout>
-      </Route>
-      <Route path="/menus">
-        <DashboardLayout>
-          <Menus />
-        </DashboardLayout>
-      </Route>
-      <Route path="/templates">
-        <DashboardLayout>
-          <Templates />
-        </DashboardLayout>
-      </Route>
-      <Route path="/complaints">
-        <DashboardLayout>
-          <Complaints />
-        </DashboardLayout>
-      </Route>
-      <Route path="/menu/classic" component={ClassicMenu} />
-      <Route path="/menu/classic/:itemId" component={ClassicMenu} />
-      <Route path="/menu/modern" component={ModernGrid} />
-      <Route path="/menu/minimalist" component={Minimalist} />
-      <Route path="/menu/colorful" component={ColorfulCards} />
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
+      <Switch location={location}>
+        <Route path="/" component={Login} />
+        <Route path="/login" component={Login} />
+        <Route path="/dashboard">
+          <DashboardLayout>
+            <Dashboard />
+          </DashboardLayout>
+        </Route>
+        <Route path="/menus">
+          <DashboardLayout>
+            <Menus />
+          </DashboardLayout>
+        </Route>
+        <Route path="/templates">
+          <DashboardLayout>
+            <Templates />
+          </DashboardLayout>
+        </Route>
+        <Route path="/complaints">
+          <DashboardLayout>
+            <Complaints />
+          </DashboardLayout>
+        </Route>
+
+        <Route path="/menu/classic" component={ClassicMenu} />
+        <Route path="/menu/classic/:itemId" component={ClassicMenu} />
+        <Route path="/menu/modern" component={ModernGrid} />
+        <Route path="/menu/minimalist" component={Minimalist} />
+        <Route path="/menu/colorful" component={ColorfulCards} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
     </AnimatePresence>
   );
 }
