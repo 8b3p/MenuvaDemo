@@ -258,7 +258,7 @@ class RootStore {
       categories: menu.categoryOrder.map((co) => {
         const category = this.categories.find((c) => c.id === co.categoryId);
         if (!category) throw new Error(`Category ${co.categoryId} not found`);
-        
+
         const items = co.itemIds
           .map((itemId) => this.items.find((i) => i.id === itemId))
           .filter((item): item is Item => item !== undefined);
@@ -380,10 +380,10 @@ class RootStore {
 
     // Templates
     this.templates = [
-      { id: 'template-1', name: 'Classic Menu', nameAr: 'القائمة الكلاسيكية', slug: 'classic', thumbnail: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0' },
-      { id: 'template-2', name: 'Modern Grid', nameAr: 'الشبكة الحديثة', slug: 'modern', thumbnail: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836' },
-      { id: 'template-3', name: 'Minimalist', nameAr: 'البسيط', slug: 'minimalist', thumbnail: 'https://images.unsplash.com/photo-1559339352-11d035aa65de' },
-      { id: 'template-4', name: 'Colorful Cards', nameAr: 'بطاقات ملونة', slug: 'colorful', thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' },
+      { id: '1', name: 'Classic Menu', nameAr: 'القائمة الكلاسيكية', slug: 'classic', thumbnail: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0' },
+      { id: '2', name: 'Modern Grid', nameAr: 'الشبكة الحديثة', slug: 'modern', thumbnail: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836' },
+      { id: '3', name: 'Minimalist', nameAr: 'البسيط', slug: 'minimalist', thumbnail: 'https://images.unsplash.com/photo-1559339352-11d035aa65de' },
+      { id: '4', name: 'Colorful Cards', nameAr: 'بطاقات ملونة', slug: 'colorful', thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' },
     ];
 
     // Mock complaints
