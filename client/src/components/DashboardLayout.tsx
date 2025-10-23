@@ -15,6 +15,11 @@ import {
   ChevronDown,
   Languages,
   X,
+  Users,
+  BarChart3,
+  Bell,
+  CreditCard,
+  Package,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,11 +30,27 @@ interface DashboardLayoutProps {
 }
 
 // Navigation items configuration
-const NAV_ITEMS = [
+interface NavItem {
+  path?: string; // Optional for dummy tabs
+  label: string;
+  labelAr: string;
+  icon: any;
+  isDummy?: boolean; // Flag for dummy tabs
+  comingSoon?: boolean; // Show "Coming Soon" badge
+}
+
+const NAV_ITEMS: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', labelAr: 'لوحة التحكم', icon: LayoutDashboard },
   { path: '/menus', label: 'Menus', labelAr: 'القوائم', icon: Menu },
   { path: '/templates', label: 'Templates', labelAr: 'القوالب', icon: FileText },
   { path: '/complaints', label: 'Complaints', labelAr: 'الشكاوى', icon: MessageSquare },
+  
+  // Dummy tabs - no navigation, just visual
+  { label: 'Analytics', labelAr: 'التحليلات', icon: BarChart3, isDummy: true, comingSoon: true },
+  { label: 'Customers', labelAr: 'العملاء', icon: Users, isDummy: true },
+  { label: 'Orders', labelAr: 'الطلبات', icon: Package, isDummy: true, comingSoon: true },
+  { label: 'Billing', labelAr: 'الفواتير', icon: CreditCard, isDummy: true },
+  { label: 'Notifications', labelAr: 'الإشعارات', icon: Bell, isDummy: true },
 ];
 
 // Shared Navigation Component
@@ -41,32 +62,58 @@ interface NavigationProps {
 }
 
 const Navigation = ({ isRTL, location, setLocation, isMobile = false }: NavigationProps) => {
-  const isActive = (path: string) => location === path;
+  const isActive = (path?: string) => path && location === path;
+
+  const handleItemClick = (item: NavItem) => {
+    if (item.isDummy) {
+      // Do nothing for dummy tabs, or show a toast/modal
+      console.log(`Clicked dummy tab: ${item.label}`);
+      return;
+    }
+    if (item.path) {
+      setLocation(item.path);
+    }
+  };
 
   return (
     <nav className={`${isMobile ? 'space-y-1' : 'flex-1 p-4 space-y-1'}`}>
       {NAV_ITEMS.map((item, index) => {
         const Icon = item.icon;
         const active = isActive(item.path);
+        const isDummy = item.isDummy;
+        
         return (
           <motion.div
-            key={item.path}
+            key={item.path || `dummy-${index}`}
             initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: isDummy ? 1.01 : 1.02 }}
+            whileTap={{ scale: isDummy ? 0.99 : 0.98 }}
           >
             <button
-              onClick={() => setLocation(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              onClick={() => handleItemClick(item)}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${
                 active
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
+                  : isDummy
+                  ? 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-default'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:translate-x-1'
               }`}
             >
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{isRTL ? item.labelAr : item.label}</span>
+              <div className="flex items-center gap-3">
+                <Icon className={`w-5 h-5 ${isDummy ? 'opacity-60' : ''}`} />
+                <span className={`font-medium ${isDummy ? 'opacity-75' : ''}`}>
+                  {isRTL ? item.labelAr : item.label}
+                </span>
+              </div>
+              
+              {/* Coming Soon Badge */}
+              {item.comingSoon && (
+                <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full">
+                  {isRTL ? 'قريباً' : 'Soon'}
+                </span>
+              )}
             </button>
           </motion.div>
         );
